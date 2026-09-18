@@ -1,8 +1,11 @@
+import Layout from "./components/layout";
 import Companies from "./pages/companies";
 
 function App() {
     return (
-        <Companies />
+        <Layout>
+            <Companies />
+        </Layout>
     );
 }
 
