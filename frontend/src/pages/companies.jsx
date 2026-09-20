@@ -3,13 +3,32 @@ import { useEffect, useState } from "react";
 function Companies() {
     const [companies, setCompanies] = useState([]);
 
-    useEffect(() => {
-        fetch("http://127.0.0.1:8000/api/companies")
-            .then(response => response.json())
-            .then(data => {
-                setCompanies(data.companies);
-            });
-    }, []);
+        useEffect(() => {
+            const token = localStorage.getItem("token");
+
+            fetch("http://127.0.0.1:8000/api/companies", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    Accept: "application/json",
+                },
+            })
+                .then(response => {
+                  
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch companies");
+                    }
+
+                    return response.json();
+                       })
+                       
+                    .then(data => {
+                        setCompanies(data.companies);
+                    })
+                
+                .catch(error => {
+                    console.error(error);
+                });
+        }, []);
 
     return (
         <div>

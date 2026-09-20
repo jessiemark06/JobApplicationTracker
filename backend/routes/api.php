@@ -7,12 +7,21 @@ use App\Http\Controllers\AuthController;
 
 Route::post('/register', [AuthController::class, 'register']);
 
-Route::get('/companies', [CompanyController::class, 'index']);
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::post('/companies', [CompanyController::class, 'store']);
+Route::middleware('auth:sanctum')->group(function() {
 
-Route::get('/companies/edit/{id}', [CompanyController::class, 'show']);
+        Route::get('/companies', [CompanyController::class, 'index']);
 
-Route::put('/companies/update/{id}', [CompanyController::class, 'update']);
+        Route::post('/companies', [CompanyController::class, 'store']);
 
-Route::delete('/companies/delete/{id}', [CompanyController::class, 'delete']);
+        Route::get('/companies/edit/{id}', [CompanyController::class, 'show']);
+
+        Route::put('/companies/update/{id}', [CompanyController::class, 'update']);
+
+        Route::delete('/companies/delete/{id}', [CompanyController::class, 'delete']);
+
+        Route::post('/logout', [AuthController::class, 'logout']);
+
+});
+
