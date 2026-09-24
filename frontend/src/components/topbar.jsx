@@ -1,8 +1,11 @@
+import { useAuth } from "../context/AuthContext";
+
 function Topbar() {
 
-    const handleLogout = async () => {
-        const token = localStorage.getItem("token");
+    const { token, logout } = useAuth();
 
+    const handleLogout = async () => {
+       
         try {
             const response = await fetch(
                 "http://127.0.0.1:8000/api/logout",
@@ -16,8 +19,8 @@ function Topbar() {
             );
 
             if (response.ok) {
-                localStorage.removeItem("token");
-                window.location.href = "/login";
+                logout();
+                window.location.href = "/";
             }
         } catch (error) {
             console.error("Logout failed:", error);
@@ -42,7 +45,7 @@ function Topbar() {
 
                     <button
                     onClick={handleLogout}
-                    className="text-sm text-gray-600 hover:text-red-600 transition"
+                    className="text-sm text-gray-600 hover:text-red-600 transition cursor-pointer"
                 >
                     Logout
                 </button>

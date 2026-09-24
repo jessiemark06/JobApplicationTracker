@@ -1,9 +1,12 @@
+ 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
     const navigate = useNavigate();
 
+    const { login } = useAuth();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -13,99 +16,116 @@ function Login() {
         event.preventDefault();
 
         try {
-           const response = await fetch(
-            "http://127.0.0.1:8000/api/login",
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password,
-                }),
-            }
-        );
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                setMessage(data.message || "Login failed");
-                return;
-            }
-
-            localStorage.setItem("token", data.token);
+            await login(email, password);
 
             setMessage("Login successful!");
 
-             navigate("/companies");
-
+            navigate("/companies");
         } catch (error) {
-            console.error(error);
-            setMessage("Something went wrong.");
+            setMessage(error.message);
         }
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
 
-            <div className="w-full max-w-md bg-white rounded-xl shadow p-8">
+            <div className="w-full max-w-md">
 
-                <h1 className="text-2xl font-bold text-gray-900">
-                    Welcome back
-                </h1>
+                {/* Back to Home */}
+                <button
+                    type="button"
+                    onClick={() => navigate("/")}
+                    className="mb-4 flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-gray-900 cursor-pointer"
+                >
+                    <span className="text-lg">←</span>
+                    Back to Home
+                </button>
 
-                <p className="text-gray-500 mt-2 mb-6">
-                    Login to your JobTrack account.
-                </p>
+                {/* Login Card */}
+                <div className="rounded-xl bg-white p-8 shadow-sm border border-gray-200">
 
-                <form onSubmit={handleLogin}>
-
-                    {/* Email */}
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Email
-                        </label>
-
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(event) => setEmail(event.target.value)}
-                            className="w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="you@example.com"
-                        />
-                    </div>
-
-                    {/* Password */}
+                    {/* Header */}
                     <div className="mb-6">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Password
-                        </label>
+                        <p className="text-sm font-semibold text-blue-600 mb-2">
+                            JobTrack
+                        </p>
 
-                        <input
-                            type="password"
-                            value={password}
-                            onChange={(event) => setPassword(event.target.value)}
-                            className="w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            placeholder="Enter your password"
-                        />
+                        <h1 className="text-2xl font-bold text-gray-900">
+                            Welcome back
+                        </h1>
+
+                        <p className="mt-2 text-sm text-gray-500">
+                            Login to your JobTrack account.
+                        </p>
                     </div>
 
-                    <button
-                        type="submit"
-                        className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition"
-                    >
-                        Login
-                    </button>
+                    {/* Login Form */}
+                    <form onSubmit={handleLogin}>
 
-                </form>
+                        {/* Email */}
+                        <div className="mb-4">
+                            <label className="mb-2 block text-sm font-medium text-gray-700">
+                                Email
+                            </label>
 
-                {message && (
-                    <p className="mt-4 text-sm text-gray-600">
-                        {message}
-                    </p>
-                )}
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={(event) => setEmail(event.target.value)}
+                                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                placeholder="you@example.com"
+                                required
+                            />
+                        </div>
+
+                        {/* Password */}
+                        <div className="mb-6">
+                            <label className="mb-2 block text-sm font-medium text-gray-700">
+                                Password
+                            </label>
+
+                            <input
+                                type="password"
+                                value={password}
+                                onChange={(event) => setPassword(event.target.value)}
+                                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                placeholder="Enter your password"
+                                required
+                            />
+                        </div>
+
+                        {/* Login Button */}
+                        <button
+                            type="submit"
+                            className="w-full rounded-lg bg-blue-600 py-3 text-sm font-medium text-white transition hover:bg-blue-700 cursor-pointer"
+                        >
+                            Login
+                        </button>
+
+                    </form>
+
+                    {/* Message */}
+                    {message && (
+                        <p className="mt-4 text-center text-sm text-gray-600">
+                            {message}
+                        </p>
+                    )}
+
+                    {/* Register */}
+                    <div className="mt-6 border-t border-gray-100 pt-5 text-center">
+                        <p className="text-sm text-gray-500">
+                            Don't have an account?{" "}
+                            <button
+                                type="button"
+                                onClick={() => navigate("/register")}
+                                className="font-medium text-blue-600 hover:text-blue-700 cursor-pointer"
+                            >
+                                Create one
+                            </button>
+                        </p>
+                    </div>
+
+                </div>
 
             </div>
 
@@ -113,4 +133,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default Login; 

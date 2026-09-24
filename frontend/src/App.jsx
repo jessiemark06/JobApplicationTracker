@@ -4,12 +4,18 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/layout";
 import Companies from "./pages/companies";
 import Login from "./pages/login";
-
+import Landing from "./pages/landing";
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
+
+                <Route
+                    path="/"
+                    element={<Landing />}
+                />
+
 
                 <Route
                     path="/login"

@@ -1,13 +1,14 @@
  
 import { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 function Companies() {
+    const { token } = useAuth();
+
     const [companies, setCompanies] = useState([]);
     const [search, setSearch] = useState("");
 
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-
+    useEffect(() => { 
         fetch("http://127.0.0.1:8000/api/companies", {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -27,7 +28,7 @@ function Companies() {
             .catch((error) => {
                 console.error(error);
             });
-    }, []);
+    }, [token]);
 
     const filteredCompanies = companies.filter((company) =>
         company.name.toLowerCase().includes(search.toLowerCase())
