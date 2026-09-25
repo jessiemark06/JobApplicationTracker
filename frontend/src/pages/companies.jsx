@@ -43,7 +43,7 @@ function Companies() {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
 
                 <div>
-                    <h1 className="text-2xl font-semibold text-gray-900">
+                    <h1 className="text-2xl font-semibold text-gray-900 ">
                         Companies
                     </h1>
 
@@ -62,6 +62,7 @@ function Companies() {
                         rounded-lg
                         hover:bg-blue-700
                         transition
+                        cursor-pointer
                     "
                      onClick={() => navigate("/companies/create")} 
                 > 

@@ -1,26 +1,28 @@
+import { useState } from "react";
 import Sidebar from "./sidebar";
 import Topbar from "./topbar";
 
 function Layout({ children }) {
+    const [sidebarOpen, setSidebarOpen] = useState(true);
+
+    const toggleSidebar = () => {
+        setSidebarOpen((currentState) => !currentState);
+    };
+
     return (
-        <div className="min-h-screen bg-gray-100 flex">
+        <div className="flex min-h-screen bg-gray-50">
+            <Sidebar isOpen={sidebarOpen} />
 
-            {/* Sidebar */}
-            <Sidebar />
+            <div className="flex min-w-0 flex-1 flex-col">
+                        <Topbar
+                toggleSidebar={toggleSidebar}
+                sidebarOpen={sidebarOpen}
+            />
 
-            {/* Right side */}
-            <div className="flex-1 flex flex-col">
-
-                {/* Topbar */}
-                <Topbar />
-
-                {/* Page content */}
                 <main className="flex-1 p-6">
                     {children}
                 </main>
-
             </div>
-
         </div>
     );
 }
