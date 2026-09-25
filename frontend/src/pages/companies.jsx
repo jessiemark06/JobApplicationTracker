@@ -1,9 +1,11 @@
  
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Companies() {
     const { token } = useAuth();
+    const navigate = useNavigate();
 
     const [companies, setCompanies] = useState([]);
     const [search, setSearch] = useState("");
@@ -61,7 +63,8 @@ function Companies() {
                         hover:bg-blue-700
                         transition
                     "
-                >
+                     onClick={() => navigate("/companies/create")} 
+                > 
                     <span className="text-lg mr-2 leading-none">+</span>
                     Add Company
                 </button>

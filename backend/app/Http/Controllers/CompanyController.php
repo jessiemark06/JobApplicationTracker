@@ -18,8 +18,9 @@ class CompanyController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            'location' => 'required|max:255',
             'website' => 'nullable|url|max:255',
+            'notes' => 'required|max:255',
         ]);
 
         $company = Company::create($request->all());
@@ -41,16 +42,18 @@ class CompanyController extends Controller
 
     public function update(Request $request, $id){
          $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+          'name' => 'required|string|max:255',
+            'location' => 'required|max:255',
             'website' => 'nullable|url|max:255',
+            'notes' => 'required|max:255',
         ]);
 
         $company= Company::findorfail($id);
         $company->update([
             'name'=>$request->name,
-            'email'=>$request->email,
-            'website'=>$request->website
+            'location'=>$request->location,
+            'website'=>$request->website,
+            'notes'=>$request->notes,
         ]);
 
         return response()->json([

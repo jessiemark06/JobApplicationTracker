@@ -5,6 +5,7 @@ import Layout from "./components/layout";
 import Companies from "./pages/companies";
 import Login from "./pages/login";
 import Landing from "./pages/landing";
+import AddCompany from "./pages/AddCompany";
 
 function App() {
     return (
@@ -28,12 +29,25 @@ function App() {
                         <ProtectedRoute>
                             <Layout>
                                 <Companies />
+                                
+                            </Layout>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/companies/create"
+                    element={
+                        <ProtectedRoute>
+                            <Layout>
+                                <AddCompany />
+                                
                             </Layout>
                         </ProtectedRoute>
                     }
                 />
 
             </Routes>
+            
         </BrowserRouter>
     );
 }
