@@ -1,4 +1,5 @@
 import people from "../assets/people.png";
+import { NavLink } from "react-router-dom";
 import {
     LayoutDashboard,
     Building2,
@@ -91,14 +92,14 @@ function Sidebar({ isOpen }) {
             <nav className="space-y-2">
 
                 {/* Dashboard */}
-                <a
-                    href="#"
-                    className={`
+                <NavLink
+                    to="/dashboard"
+                    className={({ isActive }) => `
                         flex items-center
                         px-4 py-3
                         rounded-lg
-                        bg-slate-800
-                        text-white
+                        transition
+                        ${isActive ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"}
                         ${!isOpen ? "justify-center" : ""}
                     `}
                     title={!isOpen ? "Dashboard" : ""}
@@ -110,19 +111,18 @@ function Sidebar({ isOpen }) {
                             Dashboard
                         </span>
                     )}
-                </a>
+                </NavLink>
 
                 {/* Companies */}
-                <a
-                    href="#"
-                    className={`
+                <NavLink
+                    to="/companies"
+                    end
+                    className={({ isActive }) => `
                         flex items-center
                         px-4 py-3
                         rounded-lg
-                        text-slate-300
-                        hover:bg-slate-800
-                        hover:text-white
                         transition
+                        ${isActive ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"}
                         ${!isOpen ? "justify-center" : ""}
                     `}
                     title={!isOpen ? "Companies" : ""}
@@ -134,19 +134,17 @@ function Sidebar({ isOpen }) {
                             Companies
                         </span>
                     )}
-                </a>
+                </NavLink>
 
                 {/* Applications */}
-                <a
-                    href="#"
-                    className={`
+                <NavLink
+                    to="/applications"
+                    className={({ isActive }) => `
                         flex items-center
                         px-4 py-3
                         rounded-lg
-                        text-slate-300
-                        hover:bg-slate-800
-                        hover:text-white
                         transition
+                        ${isActive ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"}
                         ${!isOpen ? "justify-center" : ""}
                     `}
                     title={!isOpen ? "Applications" : ""}
@@ -158,7 +156,7 @@ function Sidebar({ isOpen }) {
                             Applications
                         </span>
                     )}
-                </a>
+                </NavLink>
 
             </nav>
 

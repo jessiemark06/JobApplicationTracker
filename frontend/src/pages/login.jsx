@@ -20,7 +20,7 @@ function Login() {
 
             setMessage("Login successful!");
 
-            navigate("/companies");
+            navigate("/dashboard");
         } catch (error) {
             setMessage(error.message);
         }
@@ -97,7 +97,7 @@ function Login() {
                         {/* Login Button */}
                         <button
                             type="submit"
-                            className="w-full rounded-lg bg-blue-600 py-3 text-sm font-medium text-white transition hover:bg-blue-700 cursor-pointer"
+                            className="w-full rounded-lg bg-slate-900 py-3 text-sm font-medium text-white transition hover:bg-slate-800 cursor-pointer"
                         >
                             Login
                         </button>

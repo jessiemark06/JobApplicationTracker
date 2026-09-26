@@ -1,8 +1,9 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
-
-import Layout from "./components/layout";
+import Layout from "./components/Layout";
+import Dashboard from "./pages/dashboard";
 import Companies from "./pages/companies";
+import Applications from "./pages/applications";
 import Login from "./pages/login";
 import Landing from "./pages/landing";
 import AddCompany from "./pages/AddCompany";
@@ -24,12 +25,32 @@ function App() {
                 />
 
               <Route
+                    path="/dashboard"
+                    element={
+                        <ProtectedRoute>
+                            <Layout>
+                                <Dashboard />
+                                
+                            </Layout>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
                     path="/companies"
                     element={
                         <ProtectedRoute>
                             <Layout>
                                 <Companies />
-                                
+                            </Layout>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/applications"
+                    element={
+                        <ProtectedRoute>
+                            <Layout>
+                                <Applications />
                             </Layout>
                         </ProtectedRoute>
                     }

@@ -1,458 +1,191 @@
- 
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import {
+    Building2,
+    ExternalLink,
+    Globe,
+    MapPin,
+    Plus,
+    Search,
+} from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 function Companies() {
     const { token } = useAuth();
     const navigate = useNavigate();
-
     const [companies, setCompanies] = useState([]);
     const [search, setSearch] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [refreshKey, setRefreshKey] = useState(0);
 
-    useEffect(() => { 
-        fetch("http://127.0.0.1:8000/api/companies", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                Accept: "application/json",
-            },
-        })
-            .then((response) => {
+    useEffect(() => {
+        const controller = new AbortController();
+
+        async function loadCompanies() {
+            setLoading(true);
+            setError("");
+
+            try {
+                const response = await fetch(
+                    "http://127.0.0.1:8000/api/companies",
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            Accept: "application/json",
+                        },
+                        signal: controller.signal,
+                    }
+                );
+
                 if (!response.ok) {
-                    throw new Error("Failed to fetch companies");
+                    throw new Error("Failed to load companies.");
                 }
 
-                return response.json();
-            })
-            .then((data) => {
-                setCompanies(data.companies);
-            })
-            .catch((error) => {
-                console.error(error);
-            });
-    }, [token]);
+                const data = await response.json();
+                setCompanies(Array.isArray(data.companies) ? data.companies : []);
+            } catch (loadError) {
+                if (loadError.name !== "AbortError") {
+                    setError(loadError.message || "Failed to load companies.");
+                }
+            } finally {
+                if (!controller.signal.aborted) {
+                    setLoading(false);
+                }
+            }
+        }
+
+        loadCompanies();
+        return () => controller.abort();
+    }, [token, refreshKey]);
 
     const filteredCompanies = companies.filter((company) =>
-        company.name.toLowerCase().includes(search.toLowerCase())
+        company.name.toLowerCase().includes(search.trim().toLowerCase())
     );
+    const companiesWithWebsite = companies.filter((company) => company.website);
+    const companiesWithLocation = companies.filter((company) => company.location);
 
     return (
-        <div className="space-y-8">
-
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-
+        <div className="space-y-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h1 className="text-2xl font-semibold text-gray-900 ">
-                        Companies
-                    </h1>
-
-                    <p className="text-sm text-gray-500 mt-1">
-                        Keep track of the companies you're applying to.
+                    <h1 className="text-2xl font-semibold text-gray-900">Companies</h1>
+                    <p className="mt-1 text-sm text-gray-500">
+                        Manage the organizations on your job search list.
                     </p>
                 </div>
 
                 <button
-                    className="
-                        inline-flex items-center justify-center
-                        px-4 py-2.5
-                        bg-blue-600
-                        text-white
-                        text-sm font-medium
-                        rounded-lg
-                        hover:bg-blue-700
-                        transition
-                        cursor-pointer
-                    "
-                     onClick={() => navigate("/companies/create")} 
-                > 
-                    <span className="text-lg mr-2 leading-none">+</span>
+                    type="button"
+                    onClick={() => navigate("/companies/create")}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
+                >
+                    <Plus size={18} />
                     Add Company
                 </button>
-
             </div>
 
+           
 
-            {/* Summary Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-
-                {/* Total Companies */}
-                <div className="bg-white border border-gray-200 rounded-xl p-5">
-
-                    <div className="flex items-center justify-between">
-
-                        <div>
-                            <p className="text-sm text-gray-500">
-                                Total Companies
-                            </p>
-
-                            <p className="text-2xl font-semibold text-gray-900 mt-2">
-                                {companies.length}
-                            </p>
-                        </div>
-
-                        <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                            <svg
-                                className="w-5 h-5 text-blue-600"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="1.8"
-                                    d="M3 21h18M5 21V7a2 2 0 012-2h10a2 2 0 012 2v14M9 9h1m-1 4h1m4-4h1m-1 4h1"
-                                />
-                            </svg>
-                        </div>
-
+            <section className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+                <div className="flex flex-col gap-4 border-b border-gray-200 p-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h2 className="font-semibold text-gray-900">Company directory</h2>
+                        <p className="mt-1 text-sm text-gray-500">
+                            {companies.length} {companies.length === 1 ? "company" : "companies"} saved
+                        </p>
                     </div>
 
+                    <label className="relative block w-full sm:w-72">
+                        <Search
+                            size={18}
+                            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+                            aria-hidden="true"
+                        />
+                        <input
+                            type="search"
+                            value={search}
+                            onChange={(event) => setSearch(event.target.value)}
+                            placeholder="Search companies"
+                            aria-label="Search companies"
+                            className="w-full rounded-lg border border-gray-200 py-2.5 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                        />
+                    </label>
                 </div>
 
-
-                {/* With Website */}
-                <div className="bg-white border border-gray-200 rounded-xl p-5">
-
-                    <div className="flex items-center justify-between">
-
-                        <div>
-                            <p className="text-sm text-gray-500">
-                                With Website
-                            </p>
-
-                            <p className="text-2xl font-semibold text-gray-900 mt-2">
-                                {companies.filter((company) => company.website).length}
-                            </p>
-                        </div>
-
-                        <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
-                            <svg
-                                className="w-5 h-5 text-emerald-600"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="1.8"
-                                    d="M12 21a9 9 0 100-18 9 9 0 000 18zm0 0c2.2-2.4 3.5-5.6 3.5-9S14.2 5.4 12 3m0 18c-2.2-2.4-3.5-5.6-3.5-9S9.8 5.4 12 3M3.5 9h17M3.5 15h17"
-                                />
-                            </svg>
-                        </div>
-
+                {error ? (
+                    <div className="p-8 text-center">
+                        <p role="alert" className="text-sm text-red-600">{error}</p>
+                        <button
+                            type="button"
+                            onClick={() => setRefreshKey((key) => key + 1)}
+                            className="mt-3 text-sm font-medium text-blue-700 hover:text-blue-800"
+                        >
+                            Try again
+                        </button>
                     </div>
-
-                </div>
-
-
-                {/* Locations */}
-                <div className="bg-white border border-gray-200 rounded-xl p-5">
-
-                    <div className="flex items-center justify-between">
-
-                        <div>
-                            <p className="text-sm text-gray-500">
-                                Locations
-                            </p>
-
-                            <p className="text-2xl font-semibold text-gray-900 mt-2">
-                                {
-                                    new Set(
-                                        companies
-                                            .filter((company) => company.location)
-                                            .map((company) => company.location)
-                                    ).size
-                                }
-                            </p>
-                        </div>
-
-                        <div className="w-10 h-10 rounded-lg bg-violet-50 flex items-center justify-center">
-                            <svg
-                                className="w-5 h-5 text-violet-600"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="1.8"
-                                    d="M12 21s7-6.2 7-12a7 7 0 10-14 0c0 5.8 7 12 7 12z"
-                                />
-                                <circle
-                                    cx="12"
-                                    cy="9"
-                                    r="2.2"
-                                    strokeWidth="1.8"
-                                />
-                            </svg>
-                        </div>
-
+                ) : loading ? (
+                    <div className="p-10 text-center text-sm text-gray-500" role="status">
+                        Loading companies...
                     </div>
-
-                </div>
-
-            </div>
-
-
-            {/* Companies Section */}
-            <div className="bg-white border border-gray-200 rounded-xl">
-
-                {/* Section Header */}
-                <div className="px-6 py-5 border-b border-gray-200">
-
-                    <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-
-                        <div>
-                            <h2 className="text-lg font-semibold text-gray-900">
-                                Company List
-                            </h2>
-
-                            <p className="text-sm text-gray-500 mt-1">
-                                View and manage your saved companies.
-                            </p>
-                        </div>
-
-
-                        {/* Search */}
-                        <div className="relative w-full md:w-72">
-
-                            <svg
-                                className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="m21 21-4.35-4.35m1.35-5.15a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z"
-                                />
-                            </svg>
-
-                            <input
-                                type="text"
-                                placeholder="Search companies"
-                                value={search}
-                                onChange={(e) => setSearch(e.target.value)}
-                                className="
-                                    w-full
-                                    pl-9 pr-4 py-2.5
-                                    text-sm
-                                    border border-gray-200
-                                    rounded-lg
-                                    bg-gray-50
-                                    outline-none
-                                    focus:bg-white
-                                    focus:ring-2
-                                    focus:ring-blue-500/20
-                                    focus:border-blue-500
-                                    transition
-                                "
-                            />
-
-                        </div>
-
+                ) : filteredCompanies.length === 0 ? (
+                    <div className="p-10 text-center">
+                        <Building2 size={30} className="mx-auto text-gray-400" aria-hidden="true" />
+                        <p className="mt-3 font-medium text-gray-900">
+                            {search ? "No matching companies" : "No companies yet"}
+                        </p>
+                        <p className="mt-1 text-sm text-gray-500">
+                            {search ? "Try another company name." : "Add a company to start building your directory."}
+                        </p>
                     </div>
-
-                </div>
-
-
-                {/* Company List */}
-                <div className="p-6">
-
-                    {filteredCompanies.length > 0 ? (
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-
-                            {filteredCompanies.map((company) => (
-
-                                <div
-                                    key={company.id}
-                                    className="
-                                        group
-                                        border border-gray-200
-                                        rounded-xl
-                                        p-5
-                                        hover:border-blue-200
-                                        hover:shadow-sm
-                                        transition
-                                    "
-                                >
-
-                                    {/* Company Info */}
-                                    <div className="flex items-center gap-4">
-
-                                        <div className="
-                                            w-11 h-11
-                                            rounded-lg
-                                            bg-gray-100
-                                            flex items-center justify-center
-                                            shrink-0
-                                        ">
-                                            <span className="text-sm font-semibold text-gray-700">
-                                                {company.name
-                                                    .charAt(0)
-                                                    .toUpperCase()}
-                                            </span>
-                                        </div>
-
-
-                                        <div className="min-w-0">
-
-                                            <h3 className="font-semibold text-gray-900 truncate">
-                                                {company.name}
-                                            </h3>
-
-                                            <p className="text-sm text-gray-500 mt-0.5 truncate">
-                                                {company.location ||
-                                                    "Location not specified"}
-                                            </p>
-
-                                        </div>
-
-                                    </div>
-
-
-                                    {/* Details */}
-                                    <div className="mt-5 pt-4 border-t border-gray-100">
-
-                                        <div className="flex items-center justify-between">
-
-                                            <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">
-                                                Website
-                                            </span>
-
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full min-w-[600px] text-left text-sm">
+                            <thead className="bg-gray-50 text-xs uppercase text-gray-500">
+                                <tr>
+                                    <th scope="col" className="px-5 py-3 font-medium">Company</th>
+                                    <th scope="col" className="px-5 py-3 font-medium">Location</th>
+                                    <th scope="col" className="px-5 py-3 font-medium">Website</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-100">
+                                {filteredCompanies.map((company) => (
+                                    <tr key={company.id} className="hover:bg-gray-50/70">
+                                        <td className="px-5 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-100 font-medium text-gray-700">
+                                                    {company.name.charAt(0).toUpperCase()}
+                                                </span>
+                                                <span className="font-medium text-gray-900">{company.name}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-5 py-4 text-gray-600">
+                                            {company.location || "Not provided"}
+                                        </td>
+                                        <td className="px-5 py-4">
                                             {company.website ? (
-                                                <span className="
-                                                    inline-flex
-                                                    items-center
-                                                    px-2 py-1
-                                                    rounded-md
-                                                    bg-emerald-50
-                                                    text-emerald-700
-                                                    text-xs font-medium
-                                                ">
-                                                    Available
-                                                </span>
-                                            ) : (
-                                                <span className="
-                                                    inline-flex
-                                                    items-center
-                                                    px-2 py-1
-                                                    rounded-md
-                                                    bg-gray-100
-                                                    text-gray-500
-                                                    text-xs font-medium
-                                                ">
-                                                    Not added
-                                                </span>
-                                            )}
-
-                                        </div>
-
-
-                                        {/* Website Button */}
-                                        {company.website && (
-
-                                            <a
-                                                href={company.website}
-                                                target="_blank"
-                                                rel="noopener noreferrer"
-                                                className="
-                                                    mt-4
-                                                    flex items-center justify-center
-                                                    w-full
-                                                    px-4 py-2
-                                                    border border-gray-200
-                                                    rounded-lg
-                                                    text-sm font-medium
-                                                    text-gray-700
-                                                    hover:bg-gray-50
-                                                    hover:text-blue-600
-                                                    transition
-                                                "
-                                            >
-                                                View Website
-
-                                                <svg
-                                                    className="w-4 h-4 ml-2"
-                                                    fill="none"
-                                                    stroke="currentColor"
-                                                    viewBox="0 0 24 24"
+                                                <a
+                                                    href={company.website}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex items-center gap-2 font-medium text-blue-700 hover:text-blue-800"
                                                 >
-                                                    <path
-                                                        strokeLinecap="round"
-                                                        strokeLinejoin="round"
-                                                        strokeWidth="2"
-                                                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4m-5-9h7m0 0v7m0-7L11 13"
-                                                    />
-                                                </svg>
-
-                                            </a>
-
-                                        )}
-
-                                    </div>
-
-                                </div>
-
-                            ))}
-
-                        </div>
-
-                    ) : (
-
-                        /* Empty State */
-                        <div className="py-16 text-center">
-
-                            <div className="
-                                w-12 h-12
-                                mx-auto
-                                rounded-lg
-                                bg-gray-100
-                                flex items-center justify-center
-                            ">
-                                <svg
-                                    className="w-6 h-6 text-gray-400"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="1.8"
-                                        d="M3 21h18M5 21V7a2 2 0 012-2h10a2 2 0 012 2v14M9 9h1m-1 4h1m4-4h1m-1 4h1"
-                                    />
-                                </svg>
-                            </div>
-
-                            <h3 className="mt-4 text-base font-semibold text-gray-900">
-                                No companies found
-                            </h3>
-
-                            <p className="mt-1 text-sm text-gray-500">
-                                {search
-                                    ? "Try adjusting your search."
-                                    : "Add your first company to get started."}
-                            </p>
-
-                        </div>
-
-                    )}
-
-                </div>
-
-            </div>
-
+                                                    Visit website
+                                                    <ExternalLink size={14} />
+                                                </a>
+                                            ) : (
+                                                <span className="text-gray-400">Not provided</span>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </section>
         </div>
     );
 }
 
 export default Companies;
- 

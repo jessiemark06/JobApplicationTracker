@@ -5,7 +5,7 @@ function Topbar({ toggleSidebar, sidebarOpen }) {
 const location = useLocation();
 
     const getPageTitle = () => {
-        if (location.pathname === "/") {
+        if (location.pathname === "/dashboard") {
             return "Dashboard";
         }
 
@@ -15,6 +15,10 @@ const location = useLocation();
 
         if (location.pathname === "/applications") {
             return "Applications";
+        }
+
+        if (location.pathname === "/companies/create") {
+            return "Add Company";
         }
 
         return "JobTrack";
@@ -53,8 +57,8 @@ const location = useLocation();
                     className="
                         p-2
                         rounded-lg
-                        text-gray-600
-                        hover:bg-gray-100
+                        text-slate-900
+                        hover:bg-slate-100
                         hover:text-gray-900
                         transition
                         cursor-pointer
@@ -77,7 +81,7 @@ const location = useLocation();
                 </button>
 
                 <h2 className="text-lg font-semibold text-gray-800">
-                    Dashboard
+                    {getPageTitle()}
                 </h2>
 
             </div>
@@ -85,21 +89,22 @@ const location = useLocation();
             {/* Right side */}
             <div className="flex items-center">
 
-                <div
-                    className="
-                        w-9
-                        h-9
-                        rounded-full
-                        bg-blue-600
-                        text-white
-                        flex
-                        items-center
-                        justify-center
-                        font-semibold
-                    "
-                >
-                    J
-                </div>
+                <div 
+            className="
+                w-9
+                h-9
+                rounded-full
+                bg-slate-800
+                text-white
+                flex
+                items-center
+                justify-center
+                font-semibold
+                cursor-pointer
+            "
+        >
+            J
+        </div>
 
             </div>
 

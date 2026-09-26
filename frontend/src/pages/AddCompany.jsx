@@ -51,7 +51,7 @@ function AddCompany() {
                 return;
             }
 
-            navigate("/companies");
+            navigate("/dashboard");
 
         } catch (error) {
             setError("Something went wrong. Please try again.");
@@ -230,7 +230,7 @@ function AddCompany() {
 
                             <button
                                 type="button"
-                                onClick={() => navigate("/companies")}
+                                onClick={() => navigate("/dashboard")}
                                 className="
                                     px-4 py-2.5
                                     text-sm font-medium
@@ -249,12 +249,12 @@ function AddCompany() {
                                 disabled={loading}
                                 className="
                                     px-4 py-2.5
-                                    bg-blue-600
+                                    bg-slate-900
                                     text-white
                                     text-sm font-medium
                                     rounded-lg
                                     cursor-pointer
-                                    hover:bg-blue-700
+                                    hover:bg-slate-800
                                     transition
                                     disabled:opacity-50
                                     disabled:cursor-not-allowed

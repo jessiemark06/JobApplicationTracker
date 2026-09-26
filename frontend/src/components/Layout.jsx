@@ -1,13 +1,19 @@
 import { useState } from "react";
-import Sidebar from "./sidebar";
-import Topbar from "./topbar";
+import Sidebar from "./Sidebar";
+import Topbar from "./Topbar";
 
 function Layout({ children }) {
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(
+    () => localStorage.getItem("sidebarOpen") !== "false"
+        );
 
-    const toggleSidebar = () => {
-        setSidebarOpen((currentState) => !currentState);
-    };
+        const toggleSidebar = () => {
+            setSidebarOpen((currentState) => {
+                const nextState = !currentState;
+                localStorage.setItem("sidebarOpen", String(nextState));
+                return nextState;
+            });
+        };
 
     return (
         <div className="flex min-h-screen bg-gray-50">
@@ -17,8 +23,7 @@ function Layout({ children }) {
                         <Topbar
                 toggleSidebar={toggleSidebar}
                 sidebarOpen={sidebarOpen}
-            />
-
+            />   
                 <main className="flex-1 p-6">
                     {children}
                 </main>
