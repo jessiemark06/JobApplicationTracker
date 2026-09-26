@@ -2,11 +2,14 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     Building2,
+    Eye,
     ExternalLink,
     Globe,
     MapPin,
+    Pencil,
     Plus,
     Search,
+    Trash2,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
@@ -65,6 +68,32 @@ function Companies() {
     const companiesWithWebsite = companies.filter((company) => company.website);
     const companiesWithLocation = companies.filter((company) => company.location);
 
+    const handleDelete = async (company) => {
+        if (!window.confirm(`Delete ${company.name}?`)) return;
+
+        try {
+            const response = await fetch(
+                `http://127.0.0.1:8000/api/companies/delete/${company.id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        Accept: "application/json",
+                    },
+                }
+            );
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || "Failed to delete company.");
+            }
+
+            setCompanies((current) => current.filter((item) => item.id !== company.id));
+        } catch (deleteError) {
+            setError(deleteError.message || "Failed to delete company.");
+        }
+    };
+
     return (
         <div className="space-y-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -78,7 +107,7 @@ function Companies() {
                 <button
                     type="button"
                     onClick={() => navigate("/companies/create")}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
+                    className="cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800"
                 >
                     <Plus size={18} />
                     Add Company
@@ -146,6 +175,7 @@ function Companies() {
                                     <th scope="col" className="px-5 py-3 font-medium">Company</th>
                                     <th scope="col" className="px-5 py-3 font-medium">Location</th>
                                     <th scope="col" className="px-5 py-3 font-medium">Website</th>
+                                    <th scope="col" className="px-5 py-3 text-right font-medium">Actions</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
@@ -176,6 +206,34 @@ function Companies() {
                                             ) : (
                                                 <span className="text-gray-400">Not provided</span>
                                             )}
+                                        </td>
+                                        <td className="whitespace-nowrap px-5 py-4">
+                                            <div className="flex justify-end gap-1">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => navigate(`/companies/view/${company.id}`)}
+                                                    aria-label={`View ${company.name}`}
+                                                    className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-slate-900"
+                                                >
+                                                    <Eye size={17} />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => navigate(`/companies/edit/${company.id}`)}
+                                                    aria-label={`Edit ${company.name}`}
+                                                    className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-slate-900"
+                                                >
+                                                    <Pencil size={17} />
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleDelete(company)}
+                                                    aria-label={`Delete ${company.name}`}
+                                                    className="rounded-lg p-2 text-gray-500 hover:bg-red-50 hover:text-red-600"
+                                                >
+                                                    <Trash2 size={17} />
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}

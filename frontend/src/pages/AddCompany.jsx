@@ -1,9 +1,11 @@
  
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 function AddCompany() {
     const navigate = useNavigate();
+    const { id } = useParams();
+    const editing = Boolean(id);
 
     const [formData, setFormData] = useState({
         name: "",
@@ -13,7 +15,44 @@ function AddCompany() {
     });
 
     const [loading, setLoading] = useState(false);
+    const [formLoading, setFormLoading] = useState(editing);
     const [error, setError] = useState("");
+
+    useEffect(() => {
+        if (!editing) return;
+
+        async function loadCompany() {
+            try {
+                const response = await fetch(
+                    `http://127.0.0.1:8000/api/companies/edit/${id}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem("token")}`,
+                            Accept: "application/json",
+                        },
+                    }
+                );
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || "Failed to load company.");
+                }
+
+                setFormData({
+                    name: data.company.name || "",
+                    location: data.company.location || "",
+                    website: data.company.website || "",
+                    notes: data.company.notes || "",
+                });
+            } catch (loadError) {
+                setError(loadError.message || "Failed to load company.");
+            } finally {
+                setFormLoading(false);
+            }
+        }
+
+        loadCompany();
+    }, [editing, id]);
 
     const handleChange = (e) => {
         setFormData({
@@ -32,9 +71,11 @@ function AddCompany() {
 
         try {
             const response = await fetch(
-                "http://127.0.0.1:8000/api/companies",
+                editing
+                    ? `http://127.0.0.1:8000/api/companies/update/${id}`
+                    : "http://127.0.0.1:8000/api/companies",
                 {
-                    method: "POST",
+                    method: editing ? "PUT" : "POST",
                     headers: {
                         Authorization: `Bearer ${token}`,
                         Accept: "application/json",
@@ -51,7 +92,7 @@ function AddCompany() {
                 return;
             }
 
-            navigate("/dashboard");
+            navigate(editing ? "/companies" : "/dashboard");
 
         } catch (error) {
             setError("Something went wrong. Please try again.");
@@ -59,6 +100,10 @@ function AddCompany() {
             setLoading(false);
         }
     };
+
+    if (formLoading) {
+        return <div className="p-10 text-center text-sm text-gray-500">Loading company...</div>;
+    }
 
     return (
         <div className="max-w-4xl mx-auto">
@@ -69,11 +114,11 @@ function AddCompany() {
         
 
                 <h1 className="text-2xl font-semibold text-gray-900">
-                    Add Company
+                    {editing ? "Edit Company" : "Add Company"}
                 </h1>
 
                 <p className="mt-1 text-sm text-gray-500">
-                    Add a new company to your job application tracker.
+                    {editing ? "Update the company information in your tracker." : "Add a new company to your job application tracker."}
                 </p>
 
             </div>
@@ -230,7 +275,7 @@ function AddCompany() {
 
                             <button
                                 type="button"
-                                onClick={() => navigate("/dashboard")}
+                                onClick={() => navigate(editing ? "/companies" : "/dashboard")}
                                 className="
                                     px-4 py-2.5
                                     text-sm font-medium
@@ -260,7 +305,7 @@ function AddCompany() {
                                     disabled:cursor-not-allowed
                                 "
                             >
-                                {loading ? "Saving..." : "Save Company"}
+                                {loading ? "Saving..." : editing ? "Save Changes" : "Save Company"}
                             </button>
 
                         </div>

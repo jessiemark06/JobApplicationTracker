@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ApplicationController;
 
 Route::post('/register', [AuthController::class, 'register']);
 
@@ -22,6 +23,17 @@ Route::middleware('auth:sanctum')->group(function() {
         Route::delete('/companies/delete/{id}', [CompanyController::class, 'delete']);
 
         Route::post('/logout', [AuthController::class, 'logout']);
+
+        // Applications
+        Route::get('/applications', [ApplicationController::class, 'index']);
+       
+        Route::post('/applications', [ApplicationController::class, 'store']);
+        
+        Route::get('/applications/{id}', [ApplicationController::class, 'show']);
+       
+        Route::put('/applications/{id}', [ApplicationController::class, 'update']);
+       
+        Route::delete('/applications/{id}', [ApplicationController::class, 'destroy']);
 
 });
 

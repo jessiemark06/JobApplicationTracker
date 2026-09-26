@@ -17,8 +17,28 @@ const location = useLocation();
             return "Applications";
         }
 
+        if (location.pathname === "/applications/create") {
+            return "Add Application";
+        }
+
+        if (location.pathname.startsWith("/applications/edit/")) {
+            return "Edit Application";
+        }
+
+        if (location.pathname.startsWith("/applications/view/")) {
+            return "Application Details";
+        }
+
         if (location.pathname === "/companies/create") {
             return "Add Company";
+        }
+
+        if (location.pathname.startsWith("/companies/edit/")) {
+            return "Edit Company";
+        }
+
+        if (location.pathname.startsWith("/companies/view/")) {
+            return "Company Details";
         }
 
         return "JobTrack";

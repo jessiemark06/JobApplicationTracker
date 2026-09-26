@@ -12,4 +12,8 @@ class Company extends Model
         'website',
         'notes',
     ];
+
+    public function applications(){
+        return $this->hasMany(Application::class);
+    }
 }
