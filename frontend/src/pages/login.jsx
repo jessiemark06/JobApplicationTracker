@@ -38,7 +38,7 @@ function Login() {
                     className="mb-4 flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-gray-900 cursor-pointer"
                 >
                     <span className="text-lg">←</span>
-                    Back to Home
+                    Back 
                 </button>
 
                 {/* Login Card */}

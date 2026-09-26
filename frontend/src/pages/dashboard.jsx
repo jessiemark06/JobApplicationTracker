@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom"; 
 import {
     Building2,
-    Globe,
+    Briefcase,
     MapPin,
     Plus,
     ExternalLink,
@@ -13,33 +13,57 @@ function Dashboard() {
     const navigate = useNavigate();
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [applications, setApplications] = useState([]);
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token");
+    const API_BASE_URL = "http://127.0.0.1:8000/api";
 
-        fetch("http://127.0.0.1:8000/api/companies", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                Accept: "application/json",
-            },
+    // Get companies
+    fetch(`${API_BASE_URL}/companies`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+        },
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("Failed to fetch companies");
+            }
+
+            return response.json();
         })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to fetch companies");
-                }
+        .then((data) => {
+            setCompanies(data.companies);
+        })
+        .catch((error) => {
+            console.error(error);
+        });
 
-                return response.json();
-            })
-            .then((data) => {
-                setCompanies(data.companies);
-            })
-            .catch((error) => {
-                console.error(error);
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    }, []);
+    // Get applications
+    fetch(`${API_BASE_URL}/applications`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+        },
+    })
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error("Failed to fetch applications");
+            }
+
+            return response.json();
+        })
+        .then((data) => {
+            setApplications(data.applications);
+        })
+        .catch((error) => {
+            console.error(error);
+        })
+        .finally(() => {
+            setLoading(false);
+        });
+}, []);
 
     const companiesWithWebsite = companies.filter(
         (company) => company.website
@@ -119,16 +143,16 @@ function Dashboard() {
 
                         <div>
                             <p className="text-sm text-gray-500">
-                                With Website
+                                Application
                             </p>
 
                             <p className="text-2xl font-semibold text-gray-900 mt-2">
-                                {companiesWithWebsite.length}
+                                {applications.length}
                             </p>
                         </div>
 
                         <div className="w-11 h-11 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                            <Globe size={21} />
+                            <Briefcase size={21} />
                         </div>
 
                     </div>
@@ -157,18 +181,18 @@ function Dashboard() {
             </div>
 
             {/* Company List */}
-            <div className="bg-white border border-gray-200 rounded-xl">
+            <div className="bg-white border border-gray-200 rounded-xl ">
 
-                <div className="p-6 border-b border-gray-200">
+                <div className="p-6 border-b border-gray-200 bg-slate-900 rounded-t-lg">
 
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center justify-between gap-4 ">
 
                         <div>
-                            <h2 className="text-base font-semibold text-gray-900">
+                            <h2 className="text-base font-semibold text-white">
                                 Your companies
                             </h2>
 
-                            <p className="text-sm text-gray-500 mt-1">
+                            <p className="text-sm text-gray-300 mt-1">
                                 Your saved company profiles at a glance.
                             </p>
                         </div>
@@ -176,7 +200,7 @@ function Dashboard() {
                         <button
                             type="button"
                             onClick={() => navigate("/companies")}
-                            className="cursor-pointer text-sm font-medium text-blue-700 hover:text-blue-800"
+                            className="cursor-pointer text-sm font-medium text-white hover:text-gray-300"
                         >
                             View all companies
                         </button>

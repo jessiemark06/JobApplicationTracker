@@ -53,9 +53,9 @@ function ApplicationDetails() {
         <div className="mx-auto max-w-4xl space-y-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                    <button type="button" onClick={() => navigate("/applications")} className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-slate-900">
+                    <button type="button" onClick={() => navigate("/applications")} className="cursor-pointer mb-4 inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-slate-900">
                         <ArrowLeft size={16} />
-                        Back to applications
+                        Back
                     </button>
                     <h1 className="text-2xl font-semibold text-gray-900">{application.job_title}</h1>
                     <p className="mt-1 text-sm text-gray-500">{application.company?.name || "Unknown company"}</p>

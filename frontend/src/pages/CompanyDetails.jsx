@@ -49,9 +49,9 @@ function CompanyDetails() {
         <div className="mx-auto max-w-4xl space-y-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                    <button type="button" onClick={() => navigate("/companies")} className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-slate-900">
+                    <button type="button" onClick={() => navigate("/companies")} className="cursor-pointer mb-4 inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-slate-900">
                         <ArrowLeft size={16} />
-                        Back to companies
+                        Back
                     </button>
                     <div className="flex items-center gap-3">
                         <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-100 text-slate-700">
@@ -63,7 +63,7 @@ function CompanyDetails() {
                         </div>
                     </div>
                 </div>
-                <button type="button" onClick={() => navigate(`/companies/edit/${company.id}`)} className="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800">
+                <button type="button" onClick={() => navigate(`/companies/edit/${company.id}`)} className="cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800">
                     <Pencil size={17} />
                     Edit company
                 </button>

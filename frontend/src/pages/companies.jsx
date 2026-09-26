@@ -116,11 +116,11 @@ function Companies() {
 
            
 
-            <section className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-                <div className="flex flex-col gap-4 border-b border-gray-200 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <section className="overflow-hidden rounded-xl border border-gray-200 bg-white ">
+                <div className="flex flex-col p-6 border-b border-gray-200 bg-slate-900 rounded-t-lg sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h2 className="font-semibold text-gray-900">Company directory</h2>
-                        <p className="mt-1 text-sm text-gray-500">
+                        <h2 className="font-semibold text-white">Company directory</h2>
+                        <p className="mt-1 text-sm text-gray-300">
                             {companies.length} {companies.length === 1 ? "company" : "companies"} saved
                         </p>
                     </div>
@@ -137,7 +137,7 @@ function Companies() {
                             onChange={(event) => setSearch(event.target.value)}
                             placeholder="Search companies"
                             aria-label="Search companies"
-                            className="w-full rounded-lg border border-gray-200 py-2.5 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            className="bg-white text-gray-900 w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-3 text-sm focus:outline-none"
                         />
                     </label>
                 </div>
@@ -213,7 +213,7 @@ function Companies() {
                                                     type="button"
                                                     onClick={() => navigate(`/companies/view/${company.id}`)}
                                                     aria-label={`View ${company.name}`}
-                                                    className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-slate-900"
+                                                    className="cursor-pointer rounded-lg p-2 text-gray-500 hover:bg-green-200 hover:text-blue-900"
                                                 >
                                                     <Eye size={17} />
                                                 </button>
@@ -221,7 +221,7 @@ function Companies() {
                                                     type="button"
                                                     onClick={() => navigate(`/companies/edit/${company.id}`)}
                                                     aria-label={`Edit ${company.name}`}
-                                                    className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-slate-900"
+                                                    className="cursor-pointer rounded-lg p-2 text-gray-500 hover:bg-blue-200 hover:text-gray-600"
                                                 >
                                                     <Pencil size={17} />
                                                 </button>
@@ -229,7 +229,7 @@ function Companies() {
                                                     type="button"
                                                     onClick={() => handleDelete(company)}
                                                     aria-label={`Delete ${company.name}`}
-                                                    className="rounded-lg p-2 text-gray-500 hover:bg-red-50 hover:text-red-600"
+                                                    className="cursor-pointer rounded-lg p-2 text-gray-500 hover:bg-red-50 hover:text-red-600"
                                                 >
                                                     <Trash2 size={17} />
                                                 </button>

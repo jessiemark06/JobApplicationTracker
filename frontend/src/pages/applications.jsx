@@ -97,20 +97,28 @@ function Applications() {
             {error && <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
 
             <section className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-                <div className="flex flex-col gap-4 border-b border-gray-200 p-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex flex-col flex flex-col p-6 border-b border-gray-200 bg-slate-900 rounded-t-lg sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h2 className="font-semibold text-gray-900">Application pipeline</h2>
-                        <p className="mt-1 text-sm text-gray-500">{applications.length} {applications.length === 1 ? "application" : "applications"} saved</p>
+                        <h2 className="font-semibold text-white">Application pipeline</h2>
+                        <p className="mt-1 text-sm text-gray-300">{applications.length} {applications.length === 1 ? "application" : "applications"} saved</p>
                     </div>
                     <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
                         <label className="relative block sm:w-64">
                             <Search size={17} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" aria-hidden="true" />
-                            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search roles or companies" aria-label="Search applications" className="w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-3 text-sm focus:border-slate-900 focus:outline-none" />
+                            <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search roles or companies" aria-label="Search applications" className="bg-white text-gray-900 w-full rounded-lg border border-gray-200 py-2.5 pl-9 pr-3 text-sm focus:outline-none"/>
                         </label>
-                        <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)} aria-label="Filter by status" className="rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-slate-900 focus:outline-none">
-                            <option>All</option>
-                            {statuses.map((status) => <option key={status}>{status}</option>)}
-                        </select>
+                    <select
+                        value={statusFilter}
+                        onChange={(event) => setStatusFilter(event.target.value)}
+                        aria-label="Filter by status"
+                        className="bg-white text-gray-900 rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:outline-none"
+                    >
+                        <option>All</option>
+
+                        {statuses.map((status) => (
+                            <option key={status}>{status}</option>
+                        ))}
+                    </select>
                     </div>
                 </div>
 
@@ -145,10 +153,10 @@ function Applications() {
                                         <td className="whitespace-nowrap px-5 py-4 text-gray-600">{application.contact_name || "Not provided"}</td>
                                         <td className="whitespace-nowrap px-5 py-4">
                                             <div className="flex justify-end gap-1">
-                                                <button type="button" onClick={() => navigate(`/applications/view/${application.id}`)} aria-label={`View ${application.job_title}`} className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-slate-900"><Eye size={17} /></button>
-                                                {application.job_url && <a href={application.job_url} target="_blank" rel="noopener noreferrer" aria-label="Open job posting" className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-slate-900"><ExternalLink size={17} /></a>}
-                                                <button type="button" onClick={() => navigate(`/applications/edit/${application.id}`)} aria-label={`Edit ${application.job_title}`} className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 hover:text-slate-900"><Pencil size={17} /></button>
-                                                <button type="button" onClick={() => handleDelete(application.id)} aria-label={`Delete ${application.job_title}`} className="rounded-lg p-2 text-gray-500 hover:bg-red-50 hover:text-red-600"><Trash2 size={17} /></button>
+                                                <button type="button" onClick={() => navigate(`/applications/view/${application.id}`)} aria-label={`View ${application.job_title}`} className="cursor-pointer rounded-lg p-2 text-gray-500 hover:bg-green-200 hover:text-blue-900"><Eye size={17} /></button>
+                                                {application.job_url && <a href={application.job_url} target="_blank" rel="noopener noreferrer" aria-label="Open job posting" className="rounded-lg p-2 text-gray-500 hover:bg-gray-200 hover:text-slate-900"><ExternalLink size={17} /></a>}
+                                                <button type="button" onClick={() => navigate(`/applications/edit/${application.id}`)} aria-label={`Edit ${application.job_title}`} className="cursor-pointer rounded-lg p-2 text-gray-500 hover:bg-blue-200 hover:text-gray-600"><Pencil size={17} /></button>
+                                                <button type="button" onClick={() => handleDelete(application.id)} aria-label={`Delete ${application.job_title}`} className="cursor-pointer rounded-lg p-2 text-gray-500 hover:bg-red-50 hover:text-red-600"><Trash2 size={17} /></button>
                                             </div>
                                         </td>
                                     </tr>
