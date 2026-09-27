@@ -12,6 +12,7 @@ import {
     Trash2,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+const API_BASE_URL = "http://127.0.0.1:8000/api";
 
 function Companies() {
     const { token } = useAuth();
@@ -31,7 +32,7 @@ function Companies() {
 
             try {
                 const response = await fetch(
-                    "http://127.0.0.1:8000/api/companies",
+                    `${API_BASE_URL}/companies`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -73,7 +74,7 @@ function Companies() {
 
         try {
             const response = await fetch(
-                `http://127.0.0.1:8000/api/companies/delete/${company.id}`,
+                `${API_BASE_URL}/companies/delete/${company.id}`,
                 {
                     method: "DELETE",
                     headers: {

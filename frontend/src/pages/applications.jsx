@@ -1,13 +1,32 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { CalendarDays, ClipboardList, Eye, ExternalLink, Pencil, Plus, Search, Trash2 } from "lucide-react";
+import {
+    CalendarDays,
+    ClipboardList,
+    Eye,
+    ExternalLink,
+    Pencil,
+    Plus,
+    Search,
+    Trash2,
+} from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
-const statuses = ["Applied", "Screening", "Interview", "Offer", "Rejected", "Withdrawn"];
+const statuses = [
+    "Applied",
+    "Screening",
+    "Interview",
+    "Offer",
+    "Rejected",
+    "Withdrawn",
+];
+
+const API_BASE_URL = "http://127.0.0.1:8000/api";
 
 function Applications() {
     const { token } = useAuth();
     const navigate = useNavigate();
+
     const [applications, setApplications] = useState([]);
     const [companies, setCompanies] = useState([]);
     const [search, setSearch] = useState("");
@@ -15,27 +34,60 @@ function Applications() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    // Load applications and companies
     const loadData = async () => {
         setLoading(true);
         setError("");
 
         try {
-            const headers = { Authorization: `Bearer ${token}`, Accept: "application/json" };
-            const [applicationsResponse, companiesResponse] = await Promise.all([
-                fetch("http://127.0.0.1:8000/api/applications", { headers }),
-                fetch("http://127.0.0.1:8000/api/companies", { headers }),
-            ]);
+            const headers = {
+                Authorization: `Bearer ${token}`,
+                Accept: "application/json",
+            };
 
-            if (!applicationsResponse.ok || !companiesResponse.ok) {
+            // Get applications
+            const applicationsResponse = await fetch(
+                `${API_BASE_URL}/applications`,
+                {
+                    headers,
+                }
+            );
+
+            if (!applicationsResponse.ok) {
                 throw new Error("Failed to load applications.");
             }
 
             const applicationsData = await applicationsResponse.json();
+
+            setApplications(
+                Array.isArray(applicationsData.applications)
+                    ? applicationsData.applications
+                    : []
+            );
+
+            // Get companies
+            const companiesResponse = await fetch(
+                `${API_BASE_URL}/companies`,
+                {
+                    headers,
+                }
+            );
+
+            if (!companiesResponse.ok) {
+                throw new Error("Failed to load companies.");
+            }
+
             const companiesData = await companiesResponse.json();
-            setApplications(Array.isArray(applicationsData.applications) ? applicationsData.applications : []);
-            setCompanies(Array.isArray(companiesData.companies) ? companiesData.companies : []);
+
+            setCompanies(
+                Array.isArray(companiesData.companies)
+                    ? companiesData.companies
+                    : []
+            );
         } catch (loadError) {
-            setError(loadError.message || "Failed to load applications.");
+            setError(
+                loadError.message || "Failed to load applications."
+            );
         } finally {
             setLoading(false);
         }
@@ -45,30 +97,58 @@ function Applications() {
         loadData();
     }, [token]);
 
+    // Search and status filter
     const filteredApplications = applications.filter((application) => {
         const query = search.trim().toLowerCase();
-        const matchesSearch = !query ||
-            application.job_title.toLowerCase().includes(query) ||
+
+        const matchesSearch =
+            !query ||
+            application.job_title?.toLowerCase().includes(query) ||
             application.company?.name?.toLowerCase().includes(query);
-        const matchesStatus = statusFilter === "All" || application.status === statusFilter;
+
+        const matchesStatus =
+            statusFilter === "All" ||
+            application.status === statusFilter;
+
         return matchesSearch && matchesStatus;
     });
 
+    // Delete application
     const handleDelete = async (id) => {
-        if (!window.confirm("Delete this application?")) return;
+        if (!window.confirm("Delete this application?")) {
+            return;
+        }
 
         try {
-            const response = await fetch(`http://127.0.0.1:8000/api/applications/${id}`, {
-                method: "DELETE",
-                headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
-            });
-            if (!response.ok) throw new Error("Failed to delete application.");
-            setApplications((current) => current.filter((application) => application.id !== id));
+            const response = await fetch(
+                `${API_BASE_URL}/applications/${id}`,
+                {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        Accept: "application/json",
+                    },
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to delete application.");
+            }
+
+            setApplications((current) =>
+                current.filter(
+                    (application) => application.id !== id
+                )
+            );
         } catch (deleteError) {
-            setError(deleteError.message || "Failed to delete application.");
+            setError(
+                deleteError.message ||
+                    "Failed to delete application."
+            );
         }
     };
 
+    
     return (
         <div className="space-y-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

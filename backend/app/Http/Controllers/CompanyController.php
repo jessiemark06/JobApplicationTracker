@@ -7,10 +7,10 @@ use App\Models\Company;
 
 class CompanyController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         return response()->json([
-            'companies' => Company::all()
+            'companies' => Company::where('user_id', $request->user()->id)->get()
         ]);
     }
 
@@ -23,7 +23,13 @@ class CompanyController extends Controller
             'notes' => 'required|max:255',
         ]);
 
-        $company = Company::create($request->all());
+         $company = Company::create([
+            'user_id' => $request->user()->id,
+            'name' => $request->name,
+            'location' => $request->location,
+            'website' => $request->website,
+            'notes' => $request->notes,
+        ]);
 
         return response()->json([
             'message' => 'Job application created successfully',
@@ -31,13 +37,21 @@ class CompanyController extends Controller
         ], 201);
     }
 
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        $company = Company::findorfail($id);
-     
+       $company = Company::where('id', $id)
+        ->where('user_id', $request->user()->id)
+        ->first();
+
+        if (!$company) {
+            return response()->json([
+                'message' => 'Company not found'
+            ], 404);
+        }
+
         return response()->json([
-            'company' =>$company
-        ], 201);
+            'company' => $company
+        ]);
     }
 
     public function update(Request $request, $id){
@@ -48,7 +62,16 @@ class CompanyController extends Controller
             'notes' => 'required|max:255',
         ]);
 
-        $company= Company::findorfail($id);
+          $company = Company::where('id', $id)
+            ->where('user_id', $request->user()->id)
+            ->first();
+
+        if (!$company) {
+            return response()->json([
+                'message' => 'Company not found'
+            ], 404);
+        }
+
         $company->update([
             'name'=>$request->name,
             'location'=>$request->location,
@@ -62,15 +85,23 @@ class CompanyController extends Controller
         ],201);
     }
 
-    public function delete($id)
-    {
-        $company = Company::findorfail($id);
-        $company->delete();
+   public function delete(Request $request, $id)
+{
+    $company = Company::where('id', $id)
+        ->where('user_id', $request->user()->id)
+        ->first();
 
+    if (!$company) {
         return response()->json([
-            'message'=>'Job application deleted successfully',
-            'company'=>$company
-        ],201);
+            'message' => 'Company not found'
+        ], 404);
     }
+
+    $company->delete();
+
+    return response()->json([
+        'message' => 'Company deleted successfully'
+    ]);
+}
 
 }

@@ -6,30 +6,25 @@ function Landing() {
         <div className="min-h-screen bg-gray-50 text-gray-900">
 
             {/* Navigation */}
-            <nav className="border-b border-gray-200 bg-white">
+            <nav className="border-b border-gray-200 bg-slate-900">
                 <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
                     <div>
-                        <h1 className="text-xl font-bold text-gray-900">
+                        <h1 className="text-xl font-bold text-white">
                             JobTrack
                         </h1>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-300">
                             Job Application Tracker
                         </p>
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <Link
-                            to="/login"
-                            className="rounded-lg px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100"
-                        >
-                            Login
-                        </Link>
+                       
 
                         <Link
-                            to="/register"
+                            to="/login"
                             className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
                         >
-                            Get Started
+                             Login
                         </Link>
                     </div>
                 </div>

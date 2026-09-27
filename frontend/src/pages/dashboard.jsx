@@ -116,63 +116,63 @@ function Dashboard() {
             </div>
 
             {/* Statistics */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8 ">
 
-                <div className="bg-white border border-gray-200 rounded-xl p-6">
-                    <div className="flex items-center justify-between">
+                <div className="bg-slate-900 border border-gray-200 rounded-xl p-6 ">
+                    <div className="flex items-center justify-between ">
 
                         <div>
-                            <p className="text-sm text-gray-500">
+                            <p className=" text-sm text-white">
                                 Total Companies
                             </p>
 
-                            <p className="text-2xl font-semibold text-gray-900 mt-2">
+                            <p className="text-2xl font-semibold text-gray-300 mt-2">
                                 {companies.length}
                             </p>
                         </div>
 
-                        <div className="w-11 h-11 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
-                            <Building2 size={21} />
+                        <div className="w-11 h-11 rounded-lg bg-slate-900 text-white flex items-center justify-center">
+                            <Building2 size={35} />
                         </div>
 
                     </div>
                 </div>
 
-                <div className="bg-white border border-gray-200 rounded-xl p-6">
+                <div className="bg-slate-900 border border-gray-200 rounded-xl p-6">
                     <div className="flex items-center justify-between">
 
                         <div>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-white">
                                 Application
                             </p>
 
-                            <p className="text-2xl font-semibold text-gray-900 mt-2">
+                            <p className="text-2xl font-semibold text-gray-300 mt-2">
                                 {applications.length}
                             </p>
                         </div>
 
-                        <div className="w-11 h-11 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                            <Briefcase size={21} />
+                        <div className="w-11 h-11 rounded-lg bg-slate-900 text-white flex items-center justify-center">
+                            <Briefcase size={35} />
                         </div>
 
                     </div>
                 </div>
 
-                <div className="bg-white border border-gray-200 rounded-xl p-6">
+                <div className="bg-slate-900 border border-gray-200 rounded-xl p-6">
                     <div className="flex items-center justify-between">
 
                         <div>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-white">
                                 Locations
                             </p>
 
-                            <p className="text-2xl font-semibold text-gray-900 mt-2">
+                            <p className="text-2xl font-semibold text-gray-300 mt-2">
                                 {companiesWithLocation.length}
                             </p>
                         </div>
 
-                        <div className="w-11 h-11 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center">
-                            <MapPin size={21} />
+                        <div className="w-11 h-11 rounded-lg bg-slate-900 text-white flex items-center justify-center">
+                            <MapPin size={35} />
                         </div>
 
                     </div>

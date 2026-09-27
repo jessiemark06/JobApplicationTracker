@@ -10,6 +10,7 @@ import Login from "./pages/login";
 import Landing from "./pages/landing";
 import AddCompany from "./pages/AddCompany";
 import CompanyDetails from "./pages/CompanyDetails";
+import Register from "./pages/Register";
 
 function App() {
     return (
@@ -26,6 +27,8 @@ function App() {
                     path="/login"
                     element={<Login />}
                 />
+
+                <Route path="/register" element={<Register />} />
 
               <Route
                     path="/dashboard"
