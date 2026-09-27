@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL } from "../config/api";
 
 const statuses = ["Applied", "Screening", "Interview", "Offer", "Rejected", "Withdrawn"];
 
@@ -32,14 +33,14 @@ function AddApplication() {
         async function loadFormData() {
             try {
                 const headers = { Authorization: `Bearer ${token}`, Accept: "application/json" };
-                const companiesResponse = await fetch("http://127.0.0.1:8000/api/companies", { headers });
+                const companiesResponse = await fetch(`${API_BASE_URL}/companies`, { headers });
                 const companiesData = await companiesResponse.json();
                 if (!companiesResponse.ok) throw new Error(companiesData.message || "Failed to load companies.");
                 const loadedCompanies = Array.isArray(companiesData.companies) ? companiesData.companies : [];
                 setCompanies(loadedCompanies);
 
                 if (editing) {
-                    const applicationResponse = await fetch(`http://127.0.0.1:8000/api/applications/${id}`, { headers });
+                    const applicationResponse = await fetch(`${API_BASE_URL}/applications/${id}`, { headers });
                     const applicationData = await applicationResponse.json();
                     if (!applicationResponse.ok) throw new Error(applicationData.message || "Failed to load application.");
                     const application = applicationData.application;
@@ -79,8 +80,8 @@ function AddApplication() {
 
         try {
             const endpoint = editing
-                ? `http://127.0.0.1:8000/api/applications/${id}`
-                : "http://127.0.0.1:8000/api/applications";
+                ? `${API_BASE_URL}/applications/${id}`
+                : `${API_BASE_URL}/applications`;
             const response = await fetch(endpoint, {
                 method: editing ? "PUT" : "POST",
                 headers: {

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, Building2, ExternalLink, MapPin, Pencil } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL } from "../config/api";
 
 function CompanyDetails() {
     const { token } = useAuth();
@@ -14,7 +15,7 @@ function CompanyDetails() {
     useEffect(() => {
         async function loadCompany() {
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/companies/edit/${id}`, {
+                const response = await fetch(`${API_BASE_URL}/companies/edit/${id}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         Accept: "application/json",

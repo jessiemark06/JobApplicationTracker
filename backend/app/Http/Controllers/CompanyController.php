@@ -20,7 +20,7 @@ class CompanyController extends Controller
             'name' => 'required|string|max:255',
             'location' => 'required|max:255',
             'website' => 'nullable|url|max:255',
-            'notes' => 'required|max:255',
+            'notes' => 'nullable|string',
         ]);
 
          $company = Company::create([
@@ -59,7 +59,7 @@ class CompanyController extends Controller
           'name' => 'required|string|max:255',
             'location' => 'required|max:255',
             'website' => 'nullable|url|max:255',
-            'notes' => 'required|max:255',
+            'notes' => 'nullable|string',
         ]);
 
           $company = Company::where('id', $id)

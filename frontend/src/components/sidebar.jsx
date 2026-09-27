@@ -7,6 +7,7 @@ import {
     LogOut
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL } from "../config/api";
 
 function Sidebar({ isOpen }) {
 
@@ -15,7 +16,7 @@ function Sidebar({ isOpen }) {
     const handleLogout = async () => {
         try {
             const response = await fetch(
-                "http://127.0.0.1:8000/api/logout",
+                `${API_BASE_URL}/logout`,
                 {
                     method: "POST",
                     headers: {

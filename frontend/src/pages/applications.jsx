@@ -11,6 +11,7 @@ import {
     Trash2,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL } from "../config/api";
 
 const statuses = [
     "Applied",
@@ -20,8 +21,6 @@ const statuses = [
     "Rejected",
     "Withdrawn",
 ];
-
-const API_BASE_URL = "http://127.0.0.1:8000/api";
 
 function Applications() {
     const { token } = useAuth();

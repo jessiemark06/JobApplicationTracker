@@ -8,6 +8,7 @@ import {
     Plus,
     ExternalLink,
 } from "lucide-react";
+import { API_BASE_URL } from "../config/api";
 
 function Dashboard() {
     const navigate = useNavigate();
@@ -17,8 +18,6 @@ function Dashboard() {
 
     useEffect(() => {
     const token = localStorage.getItem("token");
-    const API_BASE_URL = "http://127.0.0.1:8000/api";
-
     // Get companies
     fetch(`${API_BASE_URL}/companies`, {
         headers: {

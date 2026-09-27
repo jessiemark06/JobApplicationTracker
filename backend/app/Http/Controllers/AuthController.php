@@ -11,55 +11,53 @@ class AuthController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name'=>'required|string|max:255',
-            'email'=>'required|email|unique:users,email',
-            'password'=>'required|min:8|confirmed'
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:8|confirmed'
         ]);
 
         $user = User::create([
-            'name'=>$request->name,
-            'email'=>$request->email,
-            'password'=>Hash::make($request->password)
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password)
         ]);
 
         return response()->json([
-            'message'=>'User registered successfully',
-            'user'=>$user
-        ],201);
+            'message' => 'User registered successfully',
+            'user' => $user
+        ], 201);
     }
 
     public function login(Request $request)
     {
         $request->validate([
-            'email'=> 'required|email',
-            'password'=> 'required'
+            'email' => 'required|email',
+            'password' => 'required'
         ]);
 
         $user = User::where('email', $request->email)->first();
 
-        if(!$user || !Hash::check($request->password, $user->password)){
-            return response()->jso([
-                'message'=> ' Invalid email or password',
-                'user' => $user
-            ], 201);
-        }
-
-            $token = $user->createToken('jobtrack-token')->plainTextToken;
-
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
-                'message'=>'login successful',
-                'user'=>$user,
-                'token'=>$token
-            ], 200);
+                'message' => 'Invalid email or password'
+            ], 401);
         }
 
-        public function logout(Request $request)
-        {
-            $request->user()->currentAccessToken()->delete();
+        $token = $user->createToken('jobtrack-token')->plainTextToken;
 
-            return response()->json([
-                'message'=>'Logout successful'
-            ],201);
-        }
+        return response()->json([
+            'message' => 'Login successful',
+            'user' => $user,
+            'token' => $token
+        ], 200);
     }
- 
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logout successful'
+        ], 200);
+    }
+}

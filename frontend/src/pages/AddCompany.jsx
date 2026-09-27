@@ -1,6 +1,7 @@
  
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { API_BASE_URL } from "../config/api";
 
 function AddCompany() {
     const navigate = useNavigate();
@@ -24,7 +25,7 @@ function AddCompany() {
         async function loadCompany() {
             try {
                 const response = await fetch(
-                    `http://127.0.0.1:8000/api/companies/edit/${id}`,
+                    `${API_BASE_URL}/companies/edit/${id}`,
                     {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -72,8 +73,8 @@ function AddCompany() {
         try {
             const response = await fetch(
                 editing
-                    ? `http://127.0.0.1:8000/api/companies/update/${id}`
-                    : "http://127.0.0.1:8000/api/companies",
+                    ? `${API_BASE_URL}/companies/update/${id}`
+                    : `${API_BASE_URL}/companies`,
                 {
                     method: editing ? "PUT" : "POST",
                     headers: {

@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { API_BASE_URL } from "../config/api";
 
 const AuthContext = createContext();
 
@@ -7,13 +8,21 @@ export function AuthProvider({ children }) {
     const [token, setToken] = useState(
         localStorage.getItem("token")
     );
+    const [user, setUser] = useState(() => {
+        try {
+            return JSON.parse(localStorage.getItem("user")) || null;
+        } catch {
+            localStorage.removeItem("user");
+            return null;
+        }
+    });
 
 
     //login
     const login = async (email, password) => {
 
         const response = await fetch(
-            "http://127.0.0.1:8000/api/login",
+            `${API_BASE_URL}/login`,
             {
                 method: "POST",
 
@@ -36,14 +45,18 @@ export function AuthProvider({ children }) {
         }
 
         localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
 
         setToken(data.token);
+        setUser(data.user);
     };
 
     //logout
     const logout = () => {
         localStorage.removeItem("token");
+        localStorage.removeItem("user");
         setToken(null);
+        setUser(null);
     };
 
     //children
@@ -51,6 +64,7 @@ export function AuthProvider({ children }) {
         <AuthContext.Provider
             value={{
                 token,
+                user,
                 login,
                 logout,
             }}

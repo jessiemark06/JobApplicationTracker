@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, CalendarDays, ExternalLink } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL } from "../config/api";
 
 function ApplicationDetails() {
     const { token } = useAuth();
@@ -14,7 +15,7 @@ function ApplicationDetails() {
     useEffect(() => {
         async function loadApplication() {
             try {
-                const response = await fetch(`http://127.0.0.1:8000/api/applications/${id}`, {
+                const response = await fetch(`${API_BASE_URL}/applications/${id}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         Accept: "application/json",
