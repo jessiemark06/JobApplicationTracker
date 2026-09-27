@@ -1,7 +1,8 @@
  
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { API_BASE_URL } from "../config/api";
 
 function Login() {
     const navigate = useNavigate();
@@ -11,6 +12,8 @@ function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
+    const [verificationRequired, setVerificationRequired] = useState(false);
+    const [resending, setResending] = useState(false);
 
     const handleLogin = async (event) => {
         event.preventDefault();
@@ -19,10 +22,33 @@ function Login() {
             await login(email, password);
 
             setMessage("Login successful!");
+            setVerificationRequired(false);
 
             navigate("/dashboard");
         } catch (error) {
             setMessage(error.message);
+            setVerificationRequired(error.message.toLowerCase().includes("verify your email"));
+        }
+    };
+
+    const handleResendVerification = async () => {
+        setResending(true);
+        try {
+            const response = await fetch(`${API_BASE_URL}/email/verification-notification`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify({ email }),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || "Could not resend the verification email.");
+            setMessage(data.message);
+        } catch (error) {
+            setMessage(error.message || "Could not resend the verification email.");
+        } finally {
+            setResending(false);
         }
     };
 
@@ -109,6 +135,17 @@ function Login() {
                         <p className="mt-4 text-center text-sm text-gray-600">
                             {message}
                         </p>
+                    )}
+
+                    {verificationRequired && (
+                        <button
+                            type="button"
+                            onClick={handleResendVerification}
+                            disabled={resending}
+                            className="mt-3 w-full text-center text-sm font-medium text-blue-700 underline disabled:opacity-50"
+                        >
+                            {resending ? "Sending..." : "Resend verification email"}
+                        </button>
                     )}
 
                     {/* Register */}

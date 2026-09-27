@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -22,10 +23,44 @@ class AuthController extends Controller
             'password' => Hash::make($request->password)
         ]);
 
+        $user->sendEmailVerificationNotification();
+
         return response()->json([
-            'message' => 'User registered successfully',
-            'user' => $user
+            'message' => 'Account created. Check your email for a verification link before signing in.',
         ], 201);
+    }
+
+    public function resendVerification(Request $request)
+    {
+        $request->validate(['email' => 'required|email']);
+
+        $user = User::where('email', $request->email)->first();
+
+        if ($user && !$user->hasVerifiedEmail()) {
+            $user->sendEmailVerificationNotification();
+        }
+
+        return response()->json([
+            'message' => 'If that email belongs to an unverified account, a new verification link has been sent.',
+        ]);
+    }
+
+    public function verifyEmail(Request $request, int $id, string $hash)
+    {
+        $user = User::findOrFail($id);
+
+        if (!hash_equals(sha1($user->getEmailForVerification()), $hash)) {
+            abort(403, 'This verification link is invalid.');
+        }
+
+        if (!$user->hasVerifiedEmail()) {
+            $user->markEmailAsVerified();
+            event(new Verified($user));
+        }
+
+        return response()->view('auth.email-verified', [
+            'loginUrl' => rtrim(config('app.frontend_url'), '/').'/login',
+        ]);
     }
 
     public function login(Request $request)
@@ -41,6 +76,13 @@ class AuthController extends Controller
             return response()->json([
                 'message' => 'Invalid email or password'
             ], 401);
+        }
+
+        if (!$user->hasVerifiedEmail()) {
+            return response()->json([
+                'message' => 'Please verify your email address before signing in.',
+                'email_verified' => false,
+            ], 403);
         }
 
         $token = $user->createToken('jobtrack-token')->plainTextToken;

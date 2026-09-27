@@ -10,8 +10,13 @@ use App\Http\Controllers\AdminUserController;
 Route::post('/register', [AuthController::class, 'register']);
 
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/email/verification-notification', [AuthController::class, 'resendVerification'])
+        ->middleware('throttle:6,1');
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])
+        ->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
 
-Route::middleware('auth:sanctum')->group(function() {
+Route::middleware(['auth:sanctum', 'verified.api'])->group(function() {
 
         Route::middleware('admin')->prefix('admin')->group(function () {
                 Route::get('/users', [AdminUserController::class, 'index']);

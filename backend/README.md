@@ -7,6 +7,24 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+## Email Verification
+
+New accounts must verify their email address before signing in. Configure a real SMTP provider in `backend/.env`; the default local `MAIL_MAILER=log` writes messages to Laravel's log instead of sending them.
+
+```dotenv
+APP_URL=http://127.0.0.1:8000
+FRONTEND_URL=http://localhost:5173
+MAIL_MAILER=smtp
+MAIL_HOST=your-smtp-host
+MAIL_PORT=587
+MAIL_USERNAME=your-smtp-username
+MAIL_PASSWORD=your-smtp-password
+MAIL_FROM_ADDRESS=verified-sender@example.com
+MAIL_FROM_NAME="JobTrack"
+```
+
+Use the SMTP host, port, credentials, and sender address supplied by your email provider. After changing environment settings, run `php artisan config:clear` from `backend/`. Verification links are signed and expire after 60 minutes.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

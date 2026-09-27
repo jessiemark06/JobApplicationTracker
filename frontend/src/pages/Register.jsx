@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { API_BASE_URL } from "../config/api";
 
 function Register() {
-    const navigate = useNavigate();
-
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -13,6 +11,7 @@ function Register() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState("");
+    const [resending, setResending] = useState(false);
 
     const handleRegister = async (event) => {
         event.preventDefault();
@@ -53,16 +52,11 @@ function Register() {
                 );
             }
 
-            setSuccess("Account created successfully.");
+            setSuccess(data.message || "Account created. Check your email for a verification link.");
 
             setName("");
-            setEmail("");
             setPassword("");
             setPasswordConfirmation("");
-
-            setTimeout(() => {
-                navigate("/login");
-            }, 1000);
 
         } catch (registerError) {
             setError(
@@ -70,6 +64,30 @@ function Register() {
             );
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleResendVerification = async () => {
+        setError("");
+        setSuccess("");
+        setResending(true);
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/email/verification-notification`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify({ email }),
+            });
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || "Could not resend the verification email.");
+            setSuccess(data.message);
+        } catch (resendError) {
+            setError(resendError.message || "Could not resend the verification email.");
+        } finally {
+            setResending(false);
         }
     };
 
@@ -113,8 +131,16 @@ function Register() {
 
                     {/* Success */}
                     {success && (
-                        <div className="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-600">
-                            {success}
+                        <div className="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+                            <p>{success}</p>
+                            <button
+                                type="button"
+                                onClick={handleResendVerification}
+                                disabled={resending || !email}
+                                className="mt-2 font-medium underline disabled:opacity-50"
+                            >
+                                {resending ? "Sending..." : "Resend verification email"}
+                            </button>
                         </div>
                     )}
 
@@ -219,7 +245,7 @@ function Register() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 transition"
+                            className="cursor-pointer w-full rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60 transition"
                         >
                             {loading
                                 ? "Creating account..."
