@@ -4,14 +4,15 @@ import {
     LayoutDashboard,
     Building2,
     ClipboardList,
-    LogOut
+    LogOut,
+    Users,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { API_BASE_URL } from "../config/api";
 
 function Sidebar({ isOpen }) {
 
-    const { token, logout } = useAuth();
+    const { token, user, logout } = useAuth();
 
     const handleLogout = async () => {
         try {
@@ -158,6 +159,24 @@ function Sidebar({ isOpen }) {
                         </span>
                     )}
                 </NavLink>
+
+                {user?.email?.toLowerCase() === "jessiemarkbaronda06@gmail.com" && (
+                    <NavLink
+                        to="/admin"
+                        className={({ isActive }) => `
+                            flex items-center
+                            px-4 py-3
+                            rounded-lg
+                            transition
+                            ${isActive ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"}
+                            ${!isOpen ? "justify-center" : ""}
+                        `}
+                        title={!isOpen ? "Admin users" : ""}
+                    >
+                        <Users size={20} />
+                        {isOpen && <span className="ml-3">Users</span>}
+                    </NavLink>
+                )}
 
             </nav>
 

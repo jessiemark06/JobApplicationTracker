@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/dashboard";
@@ -11,6 +11,18 @@ import Landing from "./pages/landing";
 import AddCompany from "./pages/AddCompany";
 import CompanyDetails from "./pages/CompanyDetails";
 import Register from "./pages/Register";
+import AdminUsers from "./pages/AdminUsers";
+import { useAuth } from "./context/AuthContext";
+
+function AdminRoute({ children }) {
+    const { user } = useAuth();
+
+    if (user?.email?.toLowerCase() !== "jessiemarkbaronda06@gmail.com") {
+        return <Navigate to="/dashboard" replace />;
+    }
+
+    return children;
+}
 
 function App() {
     return (
@@ -29,6 +41,18 @@ function App() {
                 />
 
                 <Route path="/register" element={<Register />} />
+                <Route
+                    path="/admin"
+                    element={
+                        <ProtectedRoute>
+                            <AdminRoute>
+                                <Layout>
+                                    <AdminUsers />
+                                </Layout>
+                            </AdminRoute>
+                        </ProtectedRoute>
+                    }
+                />
 
               <Route
                     path="/dashboard"

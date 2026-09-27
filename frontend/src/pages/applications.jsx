@@ -22,6 +22,15 @@ const statuses = [
     "Withdrawn",
 ];
 
+const statusStyles = {
+    Applied: "bg-blue-100 text-blue-800",
+    Screening: "bg-cyan-100 text-cyan-800",
+    Interview: "bg-amber-100 text-amber-800",
+    Offer: "bg-emerald-100 text-emerald-800",
+    Rejected: "bg-red-100 text-red-800",
+    Withdrawn: "bg-gray-100 text-gray-700",
+};
+
 function Applications() {
     const { token } = useAuth();
     const navigate = useNavigate();
@@ -227,7 +236,7 @@ function Applications() {
                                     <tr key={application.id} className="hover:bg-gray-50/70">
                                         <td className="whitespace-nowrap px-5 py-4 font-medium text-gray-900">{application.job_title}</td>
                                         <td className="whitespace-nowrap px-5 py-4 text-gray-600">{application.company?.name || "Unknown company"}</td>
-                                        <td className="whitespace-nowrap px-5 py-4"><span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">{application.status}</span></td>
+                                        <td className="whitespace-nowrap px-5 py-4"><span className={`rounded-full px-3 py-1 text-xs font-medium ${statusStyles[application.status] || "bg-slate-100 text-slate-700"}`}>{application.status}</span></td>
                                         <td className="whitespace-nowrap px-5 py-4 text-gray-600">{application.applied_at ? <span className="inline-flex items-center gap-1"><CalendarDays size={14} />{application.applied_at}</span> : "Not provided"}</td>
                                         <td className="whitespace-nowrap px-5 py-4 text-gray-600">{application.contact_name || "Not provided"}</td>
                                         <td className="whitespace-nowrap px-5 py-4">
