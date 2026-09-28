@@ -59,7 +59,7 @@ class AuthController extends Controller
         }
 
         return response()->view('auth.email-verified', [
-            'loginUrl' => rtrim(config('app.frontend_url'), '/').'/login',
+            'loginUrl' => rtrim(config('app.frontend_url', 'http://localhost:5173'), '/').'/#/',
         ]);
     }
 

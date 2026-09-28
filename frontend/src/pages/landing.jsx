@@ -1,5 +1,13 @@
  
 import { Link } from "react-router-dom";
+import {
+    ArrowRight,
+    Building2,
+    BriefcaseBusiness,
+    ChartNoAxesCombined,
+    ClipboardList,
+    LogIn,
+} from "lucide-react";
 
 function Landing() {
     return (
@@ -9,9 +17,10 @@ function Landing() {
             <nav className="border-b border-gray-200 bg-slate-900">
                 <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
                     <div>
-                        <h1 className="text-xl font-bold text-white">
-                            JobTrack
-                        </h1>
+                        <div className="flex items-center gap-2 text-white">
+                            <BriefcaseBusiness aria-hidden="true" size={20} />
+                            <h1 className="text-xl font-bold">JobTrack</h1>
+                        </div>
                         <p className="text-xs text-gray-300">
                             Job Application Tracker
                         </p>
@@ -22,9 +31,9 @@ function Landing() {
 
                         <Link
                             to="/login"
-                            className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
-                        >
-                             Login
+                            className="flex items-center gap-2 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+                        > 
+                            Login
                         </Link>
                     </div>
                 </div>
@@ -55,9 +64,10 @@ function Landing() {
                         <div className="mt-8 flex flex-wrap gap-3">
                             <Link
                                to="/login"
-                                className="rounded-lg bg-gray-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-gray-800"
+                                className="flex items-center gap-2 rounded-lg bg-gray-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-gray-800"
                             >
                                 Start Tracking
+                                <ArrowRight aria-hidden="true" size={16} />
                             </Link>
  
                         </div>
@@ -86,10 +96,10 @@ function Landing() {
                             <div className="flex items-center justify-between rounded-xl border border-gray-200 p-4">
                                 <div>
                                     <p className="font-medium text-gray-900">
-                                        Junior Web Developer
+                                        Marketing Coordinator
                                     </p>
                                     <p className="text-sm text-gray-500">
-                                        Tech Company
+                                        Northstar Retail
                                     </p>
                                 </div>
 
@@ -101,10 +111,10 @@ function Landing() {
                             <div className="flex items-center justify-between rounded-xl border border-gray-200 p-4">
                                 <div>
                                     <p className="font-medium text-gray-900">
-                                        Junior Full-Stack Developer
+                                        Operations Analyst
                                     </p>
                                     <p className="text-sm text-gray-500">
-                                        Software Solutions
+                                        Greenline Logistics
                                     </p>
                                 </div>
 
@@ -116,10 +126,10 @@ function Landing() {
                             <div className="flex items-center justify-between rounded-xl border border-gray-200 p-4">
                                 <div>
                                     <p className="font-medium text-gray-900">
-                                        Frontend Developer
+                                        Registered Nurse
                                     </p>
                                     <p className="text-sm text-gray-500">
-                                        Digital Agency
+                                        Harbor Medical Center
                                     </p>
                                 </div>
 
@@ -153,7 +163,7 @@ function Landing() {
 
                         <div className="rounded-xl border border-gray-200 bg-gray-50 p-6">
                             <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white text-gray-700 shadow-sm">
-                                +
+                                <ClipboardList aria-hidden="true" size={20} />
                             </div>
 
                             <h4 className="font-semibold text-gray-900">
@@ -168,7 +178,7 @@ function Landing() {
 
                         <div className="rounded-xl border border-gray-200 bg-gray-50 p-6">
                             <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white text-gray-700 shadow-sm">
-                                ✓
+                                <ChartNoAxesCombined aria-hidden="true" size={20} />
                             </div>
 
                             <h4 className="font-semibold text-gray-900">
@@ -183,7 +193,7 @@ function Landing() {
 
                         <div className="rounded-xl border border-gray-200 bg-gray-50 p-6">
                             <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white text-gray-700 shadow-sm">
-                                #
+                                <Building2 aria-hidden="true" size={20} />
                             </div>
 
                             <h4 className="font-semibold text-gray-900">
@@ -224,13 +234,13 @@ function Landing() {
             </section>
 
             {/* Footer */}
-            <footer className="border-t border-gray-200 bg-white">
+            <footer className="border-t border-gray-200 bg-slate-900">
                 <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-300">
                         © 2026 JobTrack
                     </p>
 
-                    <p className="text-sm text-gray-400">
+                    <p className="text-sm text-gray-300">
                         Job Application Tracker
                     </p>
                 </div>

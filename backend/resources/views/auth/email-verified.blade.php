@@ -15,8 +15,8 @@
 <body>
     <main>
         <h1>Email verified</h1>
-        <p>Your JobTrack account is confirmed. You can now sign in.</p>
-        <a href="{{ $loginUrl }}">Continue to sign in</a>
+        <p>Your JobTrack account is confirmed. You can now continue to the website.</p>
+        <a href="{{ $loginUrl }}">Continue to website</a>
     </main>
 </body>
 </html>

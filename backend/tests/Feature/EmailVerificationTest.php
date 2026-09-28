@@ -61,4 +61,24 @@ class EmailVerificationTest extends TestCase
         $this->get($verificationUrl)->assertOk()->assertSee('Email verified');
         $this->assertNotNull($user->fresh()->email_verified_at);
     }
+
+    public function test_verification_page_redirects_to_frontend_home_page(): void
+    {
+        config()->set('app.frontend_url', 'https://jobtrack.vercel.app');
+
+        $user = User::factory()->unverified()->create([
+            'email' => 'home-page@example.com',
+            'password' => 'password123',
+        ]);
+
+        $verificationUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(30),
+            ['id' => $user->id, 'hash' => sha1($user->getEmailForVerification())],
+        );
+
+        $this->get($verificationUrl)
+            ->assertOk()
+            ->assertSee('https://jobtrack.vercel.app/#/');
+    }
 }

@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Layout from "./components/Layout";
 import Dashboard from "./pages/dashboard";
@@ -26,7 +26,7 @@ function AdminRoute({ children }) {
 
 function App() {
     return (
-        <BrowserRouter>
+        <HashRouter>
             <Routes>
 
                 <Route
@@ -149,7 +149,7 @@ function App() {
 
             </Routes>
             
-        </BrowserRouter>
+        </HashRouter>
     );
 }
 

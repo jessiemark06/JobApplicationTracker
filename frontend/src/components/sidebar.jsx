@@ -1,8 +1,8 @@
-import people from "../assets/people.png";
 import { NavLink } from "react-router-dom";
 import {
     LayoutDashboard,
     Building2,
+    BriefcaseBusiness,
     ClipboardList,
     LogOut,
     Users,
@@ -66,10 +66,10 @@ function Sidebar({ isOpen }) {
                     `}
                 >
 
-                    <img
-                        src={people}
-                        alt="JobTrack"
-                        className="w-10 h-10 object-contain"
+                    <BriefcaseBusiness
+                        aria-hidden="true"
+                        size={24}
+                        className="shrink-0"
                     />
 
                     {isOpen && (
