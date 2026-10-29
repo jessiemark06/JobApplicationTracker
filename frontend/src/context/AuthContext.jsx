@@ -59,6 +59,11 @@ export function AuthProvider({ children }) {
         setUser(null);
     };
 
+    const updateUser = (updatedUser) => {
+        localStorage.setItem("user", JSON.stringify(updatedUser));
+        setUser(updatedUser);
+    };
+
     //children
     return (
         <AuthContext.Provider
@@ -67,6 +72,7 @@ export function AuthProvider({ children }) {
                 user,
                 login,
                 logout,
+                updateUser,
             }}
         >
             {children}
@@ -74,6 +80,8 @@ export function AuthProvider({ children }) {
     );
 }
 
+// Keep the existing context hook API while the provider remains Fast Refresh compatible.
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAuth() {
     return useContext(AuthContext);
 }

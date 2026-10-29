@@ -9,8 +9,11 @@ const emptyForm = {
     company_id: "",
     job_title: "",
     status: "Applied",
+    status_note: "",
     applied_at: "",
     job_url: "",
+    source: "",
+    job_description: "",
     contact_name: "",
     contact_role: "",
     contact_email: "",
@@ -48,8 +51,11 @@ function AddApplication() {
                         company_id: application.company_id?.toString() || "",
                         job_title: application.job_title || "",
                         status: application.status || "Applied",
+                        status_note: "",
                         applied_at: application.applied_at || "",
                         job_url: application.job_url || "",
+                        source: application.source || "",
+                        job_description: application.job_description || "",
                         contact_name: application.contact_name || "",
                         contact_role: application.contact_role || "",
                         contact_email: application.contact_email || "",
@@ -131,6 +137,9 @@ function AddApplication() {
                                 {statuses.map((status) => <option key={status}>{status}</option>)}
                             </select>
                         </label>
+                        <label className="text-sm font-medium text-gray-700">Status change note (optional)
+                            <input name="status_note" value={form.status_note} onChange={handleChange} placeholder="e.g. Recruiter scheduled a technical interview" className="mt-1.5 w-full rounded-lg border border-gray-300 px-4 py-2.5 font-normal focus:border-slate-900 focus:outline-none" />
+                        </label>
                         <label className="text-sm font-medium text-gray-700">Applied date
                             <input type="date" name="applied_at" value={form.applied_at} onChange={handleChange} className="mt-1.5 w-full rounded-lg border border-gray-300 px-4 py-2.5 font-normal focus:border-slate-900 focus:outline-none" />
                         </label>
@@ -138,6 +147,14 @@ function AddApplication() {
 
                     <label className="block text-sm font-medium text-gray-700">Job posting URL
                         <input type="url" name="job_url" value={form.job_url} onChange={handleChange} placeholder="https://..." className="mt-1.5 w-full rounded-lg border border-gray-300 px-4 py-2.5 font-normal focus:border-slate-900 focus:outline-none" />
+                    </label>
+
+                    <label className="block text-sm font-medium text-gray-700">Application source
+                        <input name="source" value={form.source} onChange={handleChange} placeholder="e.g. Company careers page, referral" className="mt-1.5 w-full rounded-lg border border-gray-300 px-4 py-2.5 font-normal focus:border-slate-900 focus:outline-none" />
+                    </label>
+
+                    <label className="block text-sm font-medium text-gray-700">Saved job description
+                        <textarea name="job_description" value={form.job_description} onChange={handleChange} rows={5} className="mt-1.5 w-full rounded-lg border border-gray-300 px-4 py-2.5 font-normal focus:border-slate-900 focus:outline-none" />
                     </label>
 
                     <div className="grid grid-cols-1 gap-5 md:grid-cols-2">

@@ -1,418 +1,345 @@
-
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
+    ArrowDown,
     ArrowRight,
+    BellRing,
     BriefcaseBusiness,
     Building2,
+    CalendarDays,
+    ChartNoAxesCombined,
+    Check,
     CheckCircle2,
     ClipboardList,
-    Clock3,
-    TrendingUp,
-    ChartNoAxesCombined,
-    Sparkles,
+    Menu,
+    X,
 } from "lucide-react";
 
 const applications = [
+    { role: "Frontend Developer", company: "Northstar Studio", status: "Interview", tone: "bg-blue-50 text-blue-700" },
+    { role: "Junior Software Engineer", company: "Fieldwork Labs", status: "Applied", tone: "bg-gray-100 text-gray-700" },
+    { role: "Product Support Associate", company: "Common Ground", status: "Screening", tone: "bg-amber-50 text-amber-700" },
+];
+
+const features = [
     {
-        role: "Frontend Developer",
-        company: "Tech Solutions Inc.",
-        initials: "TS",
-        color: "bg-indigo-100 text-indigo-700",
-        status: "Interview",
-        statusStyle: "bg-amber-50 text-amber-700 ring-amber-600/20",
-        date: "Oct 20, 2026",
+        icon: ClipboardList,
+        title: "Application tracking",
+        description: "Keep role details, application dates, contacts, and status history together in one organized place.",
     },
     {
-        role: "Junior Software Engineer",
-        company: "Digital Innovations",
-        initials: "DI",
-        color: "bg-sky-100 text-sky-700",
-        status: "Applied",
-        statusStyle: "bg-blue-50 text-blue-700 ring-blue-600/20",
-        date: "Oct 18, 2026",
+        icon: CalendarDays,
+        title: "Interviews & events",
+        description: "Schedule interviews and recruitment events, review their history, and keep upcoming steps in view.",
     },
     {
-        role: "Web Developer",
-        company: "Creative Labs",
-        initials: "CL",
-        color: "bg-emerald-100 text-emerald-700",
-        status: "Offer",
-        statusStyle: "bg-emerald-50 text-emerald-700 ring-emerald-600/20",
-        date: "Oct 16, 2026",
+        icon: ChartNoAxesCombined,
+        title: "Application analytics",
+        description: "Review your pipeline and application outcomes to understand how your search is progressing.",
+    },
+    {
+        icon: CheckCircle2,
+        title: "Skills & job requirements",
+        description: "Compare the skills you have with role requirements and keep your learning priorities visible.",
+    },
+    {
+        icon: BriefcaseBusiness,
+        title: "Career tools",
+        description: "Keep follow-ups, company research, and application documents close to the opportunities they support.",
+    },
+    {
+        icon: BellRing,
+        title: "Follow-up reminders",
+        description: "Get in-app reminders for upcoming events and follow-ups so important next steps are easier to remember.",
+    },
+];
+
+const steps = [
+    {
+        number: "01",
+        title: "Add companies and applications",
+        description: "Save the roles you are considering, along with company details and the information you need later.",
+    },
+    {
+        number: "02",
+        title: "Track progress and prepare",
+        description: "Update each application as it moves forward, schedule interviews, and organize follow-ups.",
+    },
+    {
+        number: "03",
+        title: "Review and refine your search",
+        description: "Use your pipeline and analytics to reflect on progress and decide where to focus next.",
     },
 ];
 
 function Landing() {
+    const [menuOpen, setMenuOpen] = useState(false);
+
+    const scrollToSection = (event, sectionId) => {
+        event.preventDefault();
+        setMenuOpen(false);
+
+        const section = document.getElementById(sectionId);
+        if (section) {
+            section.scrollIntoView({
+                behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+                ? "auto"
+                    : "smooth",
+                block: "start",
+            });
+        }
+    };
+
     return (
-        <div className="min-h-screen overflow-hidden bg-white font-sans text-slate-900">
-
-            {/* Navigation */}
-            <nav className="sticky top-0 z-50 border-b border-slate-200/70 bg-white/90 backdrop-blur-xl">
-                <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
-
-                    <Link to="/" className="flex items-center gap-3">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-600/20">
-                            <BriefcaseBusiness size={22} />
-                        </div>
-
-                        <div>
-                            <h1 className="text-xl font-extrabold tracking-tight text-slate-900">
-                                JobTrack<span className="text-indigo-600">.</span>
-                            </h1>
-                            <p className="text-xs font-medium text-slate-500">
-                                Your career, organized.
-                            </p>
-                        </div>
+        <div className="min-h-screen overflow-hidden bg-white font-sans text-gray-900">
+            <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur">
+                <nav aria-label="Main navigation" className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3.5 sm:px-8">
+                    <Link to="/" className="flex items-center gap-3 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white">
+                            <BriefcaseBusiness size={21} aria-hidden="true" />
+                        </span>
+                        <span>
+                            <span className="block text-lg font-bold tracking-tight text-slate-900">JobTrack</span>
+                            <span className="block text-xs text-gray-500">Job Application Tracker</span>
+                        </span>
                     </Link>
 
-                    <div className="flex items-center gap-3">
-                        <Link
-                            to="/login"
-                            className="hidden rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-100 sm:inline-flex"
-                        >
-                            Log in
-                        </Link>
-
-                        <Link
-                            to="/register"
-                            className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2.5 text-sm font-semibold text-white shadow-md shadow-indigo-600/20 transition hover:-translate-y-0.5 hover:bg-indigo-700 sm:px-5"
-                        >
-                            Get started
-                            <ArrowRight size={16} />
-                        </Link>
-                    </div>
-                </div>
-            </nav>
-
-            {/* Hero */}
-            <main>
-                <section className="relative">
-                    <div className="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
-                        <div className="absolute -right-40 -top-32 h-96 w-96 rounded-full bg-indigo-100/70 blur-3xl" />
-                        <div className="absolute -left-40 top-48 h-80 w-80 rounded-full bg-sky-100/60 blur-3xl" />
+                    <div className="hidden items-center gap-7 md:flex">
+                        <a href="#features" onClick={(event) => scrollToSection(event, "features")} className="text-sm font-medium text-gray-600 transition hover:text-slate-900 focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900">Features</a>
+                        <a href="#how-it-works" onClick={(event) => scrollToSection(event, "how-it-works")} className="text-sm font-medium text-gray-600 transition hover:text-slate-900 focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900">How it works</a>
+                        <a href="#about" onClick={(event) => scrollToSection(event, "about")} className="text-sm font-medium text-gray-600 transition hover:text-slate-900 focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900">About</a>
                     </div>
 
-                    <div className="relative mx-auto grid max-w-7xl items-center gap-14 px-5 py-16 sm:px-8 sm:py-24 lg:grid-cols-2 lg:gap-16 lg:py-28">
+                    <div className="hidden items-center gap-2 md:flex">
+                        <Link to="/login" className="rounded-lg px-4 py-2.5 text-sm font-medium text-slate-900 transition hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900">Log in</Link>
+                        <Link to="/register" className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900">
+                            Get started <ArrowRight size={16} aria-hidden="true" />
+                        </Link>
+                    </div>
 
-                        {/* Hero copy */}
-                        <div>
-                            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-indigo-50/80 px-4 py-2 text-sm font-semibold text-indigo-700">
-                                <Sparkles size={16} />
-                                A smarter way to job hunt
-                            </div>
+                    <button
+                        type="button"
+                        aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+                        aria-expanded={menuOpen}
+                        aria-controls="mobile-navigation"
+                        onClick={() => setMenuOpen((open) => !open)}
+                        className="inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-900 transition hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 md:hidden"
+                    >
+                        {menuOpen ? <X size={21} aria-hidden="true" /> : <Menu size={21} aria-hidden="true" />}
+                    </button>
+                </nav>
 
-                            <h2 className="max-w-2xl text-4xl font-extrabold leading-[1.12] tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
-                                Your next opportunity,
-                                <span className="mt-2 block text-indigo-600">
-                                    all in one place.
-                                </span>
-                            </h2>
-
-                            <p className="mt-6 max-w-xl text-base leading-8 text-slate-600 sm:text-lg">
-                                Job searching is easier when everything is
-                                organized. Track applications, manage company
-                                details, and keep every opportunity moving
-                                forward with JobTrack.
-                            </p>
-
-                            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                                <Link
-                                    to="/register"
-                                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-indigo-600 px-7 py-4 text-sm font-bold text-white shadow-lg shadow-indigo-600/25 transition hover:-translate-y-1 hover:bg-indigo-700"
-                                >
-                                    Start tracking for free
-                                    <ArrowRight size={18} />
-                                </Link>
-
-                                <Link
-                                    to="/login"
-                                    className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-7 py-4 text-sm font-bold text-slate-700 transition hover:border-indigo-200 hover:bg-indigo-50"
-                                >
-                                    I already have an account
-                                </Link>
-                            </div>
-
-                            <div className="mt-8 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-slate-500">
-                                <span className="inline-flex items-center gap-2">
-                                    <CheckCircle2 size={17} className="text-emerald-500" />
-                                    Organized applications
-                                </span>
-                                <span className="inline-flex items-center gap-2">
-                                    <CheckCircle2 size={17} className="text-emerald-500" />
-                                    Easy status tracking
-                                </span>
+                {menuOpen && (
+                    <div id="mobile-navigation" className="border-t border-gray-200 bg-white px-5 py-4 shadow-lg md:hidden">
+                        <div className="mx-auto flex max-w-7xl flex-col gap-1">
+                            <a href="#features" onClick={(event) => scrollToSection(event, "features")} className="rounded-lg px-3 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-900">Features</a>
+                            <a href="#how-it-works" onClick={(event) => scrollToSection(event, "how-it-works")} className="rounded-lg px-3 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-900">How it works</a>
+                            <a href="#about" onClick={(event) => scrollToSection(event, "about")} className="rounded-lg px-3 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-slate-900">About</a>
+                            <div className="mt-2 grid grid-cols-2 gap-3 border-t border-gray-100 pt-4">
+                                <Link to="/login" onClick={() => setMenuOpen(false)} className="inline-flex items-center justify-center rounded-lg border border-gray-200 px-4 py-2.5 text-sm font-medium text-slate-900 transition hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900">Log in</Link>
+                                <Link to="/register" onClick={() => setMenuOpen(false)} className="inline-flex items-center justify-center rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900">Get started</Link>
                             </div>
                         </div>
+                    </div>
+                )}
+            </header>
 
-                        {/* Dashboard preview */}
-                        <div className="relative mx-auto w-full max-w-xl lg:ml-auto">
-                            <div className="absolute -inset-4 -z-10 rounded-[2rem] bg-gradient-to-br from-indigo-200/60 via-white to-sky-200/60 blur-2xl" />
+            <main>
+                <section className="bg-gray-50">
+                    <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 lg:py-24">
+                        <div>
+                            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm">
+                                <BriefcaseBusiness size={16} aria-hidden="true" />
+                                A clearer way to manage your search
+                            </div>
+                            <h1 className="max-w-2xl text-4xl font-bold leading-tight tracking-tight text-slate-900 sm:text-5xl lg:text-[3.5rem]">
+                                Make your next career move with a plan.
+                            </h1>
+                            <p className="mt-6 max-w-xl text-base leading-7 text-gray-600 sm:text-lg sm:leading-8">
+                                Organize applications, prepare for interviews, and keep your job search moving forward—all in one focused workspace.
+                            </p>
+                            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                                <Link to="/register" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900">
+                                    Get started <ArrowRight size={17} aria-hidden="true" />
+                                </Link>
+                                <a href="#features" onClick={(event) => scrollToSection(event, "features")} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition hover:border-gray-400 hover:bg-gray-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900">
+                                    Explore features <ArrowDown size={16} aria-hidden="true" />
+                                </a>
+                            </div>
+                            <p className="mt-5 text-sm text-gray-500">
+                                Already have an account? <Link to="/login" className="font-semibold text-slate-900 underline decoration-gray-300 underline-offset-4 hover:decoration-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900">Log in</Link>
+                            </p>
+                        </div>
 
-                            <div className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10">
-
-                                {/* Dashboard header */}
-                                <div className="flex items-center justify-between border-b border-slate-100 px-5 py-5 sm:px-7">
-                                    <div>
-                                        <div className="flex items-center gap-2">
-                                            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 text-white">
-                                                <BriefcaseBusiness size={18} />
-                                            </div>
-                                            <h3 className="font-bold text-slate-900">
-                                                Dashboard
-                                            </h3>
-                                        </div>
-                                        <p className="mt-2 text-xs text-slate-500">
-                                            Here's your job search overview
-                                        </p>
-                                    </div>
-
-                                    <div className="rounded-full bg-emerald-50 px-3 py-1.5 text-xs font-semibold text-emerald-700">
-                                        ● Active
-                                    </div>
-                                </div>
-
-                                {/* Stats */}
-                                <div className="grid grid-cols-3 gap-3 p-4 sm:gap-4 sm:p-6">
-                                    <div className="rounded-2xl border border-slate-100 bg-slate-50 p-3 sm:p-4">
-                                        <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-100 text-indigo-700">
-                                            <ClipboardList size={17} />
-                                        </div>
-                                        <p className="text-2xl font-extrabold text-slate-900">
-                                            12
-                                        </p>
-                                        <p className="mt-1 text-xs text-slate-500">
-                                            Applications
-                                        </p>
-                                    </div>
-
-                                    <div className="rounded-2xl border border-slate-100 bg-slate-50 p-3 sm:p-4">
-                                        <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-amber-100 text-amber-700">
-                                            <Clock3 size={17} />
-                                        </div>
-                                        <p className="text-2xl font-extrabold text-slate-900">
-                                            4
-                                        </p>
-                                        <p className="mt-1 text-xs text-slate-500">
-                                            In progress
-                                        </p>
-                                    </div>
-
-                                    <div className="rounded-2xl border border-slate-100 bg-slate-50 p-3 sm:p-4">
-                                        <div className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-100 text-emerald-700">
-                                            <TrendingUp size={17} />
-                                        </div>
-                                        <p className="text-2xl font-extrabold text-slate-900">
-                                            2
-                                        </p>
-                                        <p className="mt-1 text-xs text-slate-500">
-                                            Offers
-                                        </p>
-                                    </div>
-                                </div>
-
-                                {/* Application list */}
-                                <div className="px-4 pb-5 sm:px-6 sm:pb-7">
-                                    <div className="mb-4 flex items-center justify-between">
+                        <div aria-label="Illustrative JobTrack application dashboard preview" className="mx-auto w-full max-w-2xl">
+                            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl shadow-slate-900/5">
+                                <div className="flex items-center justify-between gap-3 border-b border-gray-200 bg-slate-900 px-4 py-4 text-white sm:px-6">
+                                    <div className="flex items-center gap-3">
+                                        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10">
+                                            <BriefcaseBusiness size={18} aria-hidden="true" />
+                                        </span>
                                         <div>
-                                            <h4 className="font-bold text-slate-900">
-                                                Recent applications
-                                            </h4>
-                                            <p className="mt-1 text-xs text-slate-500">
-                                                Keep an eye on your opportunities
-                                            </p>
+                                            <p className="text-sm font-semibold">Dashboard</p>
+                                            <p className="mt-0.5 text-xs text-gray-300">Your job search at a glance</p>
                                         </div>
-                                        <ClipboardList
-                                            size={19}
-                                            className="text-slate-400"
-                                        />
                                     </div>
-
-                                    <div className="space-y-3">
-                                        {applications.map((app) => (
-                                            <div
-                                                key={app.role}
-                                                className="flex items-center gap-3 rounded-2xl border border-slate-100 p-3 transition hover:border-indigo-200 hover:bg-indigo-50/30 sm:gap-4 sm:p-4"
-                                            >
-                                                <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-xs font-extrabold ${app.color}`}>
-                                                    {app.initials}
+                                    <span className="hidden items-center gap-1.5 rounded-full bg-white/10 px-3 py-1.5 text-xs font-medium text-gray-100 sm:inline-flex">
+                                        <span className="h-1.5 w-1.5 rounded-full bg-blue-300" /> Your workspace
+                                    </span>
+                                </div>
+                                <div className="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3 sm:gap-4 sm:p-6">
+                                    <PreviewStat icon={Building2} label="Companies" />
+                                    <PreviewStat icon={ClipboardList} label="Applications" />
+                                    <PreviewStat icon={CalendarDays} label="Next event" className="col-span-2 sm:col-span-1" />
+                                </div>
+                                <div className="px-4 pb-5 sm:px-6 sm:pb-6">
+                                    <div className="mb-3 flex items-center justify-between gap-2">
+                                        <div>
+                                            <h2 className="text-sm font-semibold text-slate-900">Application pipeline</h2>
+                                            <p className="mt-1 text-xs text-gray-500">Keep each opportunity and next step together.</p>
+                                        </div>
+                                        <span className="hidden rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 sm:inline-flex">View applications</span>
+                                    </div>
+                                    <div className="overflow-hidden rounded-lg border border-gray-200">
+                                        {applications.map((application, index) => (
+                                            <div key={application.role} className={`flex items-center justify-between gap-3 px-3 py-3 sm:px-4 ${index > 0 ? "border-t border-gray-100" : ""}`}>
+                                                <div className="flex min-w-0 items-center gap-3">
+                                                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-semibold text-slate-700">
+                                                        {application.company.split(" ").map((word) => word[0]).join("").slice(0, 2)}
+                                                    </span>
+                                                    <div className="min-w-0">
+                                                        <p className="truncate text-xs font-semibold text-slate-900 sm:text-sm">{application.role}</p>
+                                                        <p className="mt-0.5 truncate text-xs text-gray-500">{application.company}</p>
+                                                    </div>
                                                 </div>
-
-                                                <div className="min-w-0 flex-1">
-                                                    <p className="truncate text-sm font-bold text-slate-800">
-                                                        {app.role}
-                                                    </p>
-                                                    <p className="mt-1 truncate text-xs text-slate-500">
-                                                        {app.company}
-                                                    </p>
-                                                    <p className="mt-1.5 text-[11px] text-slate-400">
-                                                        {app.date}
-                                                    </p>
-                                                </div>
-
-                                                <span className={`shrink-0 rounded-full px-2.5 py-1.5 text-[10px] font-bold ring-1 ring-inset sm:text-xs ${app.statusStyle}`}>
-                                                    {app.status}
-                                                </span>
+                                                <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-medium sm:text-xs ${application.tone}`}>{application.status}</span>
                                             </div>
                                         ))}
                                     </div>
-
-                                    <div className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-indigo-50 px-4 py-3 text-xs font-semibold text-indigo-700">
-                                        <ChartNoAxesCombined size={16} />
-                                        Your job search, at a glance
+                                    <div className="mt-4 flex items-center gap-2 rounded-lg border border-blue-100 bg-blue-50 px-3 py-3 text-xs text-blue-900 sm:text-sm">
+                                        <CalendarDays size={16} className="shrink-0 text-blue-700" aria-hidden="true" />
+                                        <span>Interviews and follow-ups stay connected to your applications.</span>
                                     </div>
                                 </div>
                             </div>
-
-                            {/* Floating company card */}
-                            <div className="absolute -left-4 top-24 hidden items-center gap-3 rounded-2xl border border-slate-100 bg-white p-3 shadow-xl shadow-slate-900/10 sm:flex lg:-left-10">
-                                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
-                                    <CheckCircle2 size={21} />
-                                </div>
-                                <div>
-                                    <p className="text-xs font-bold text-slate-800">
-                                        Stay organized
-                                    </p>
-                                    <p className="mt-1 text-[11px] text-slate-500">
-                                        One step at a time
-                                    </p>
-                                </div>
-                            </div>
+                            <p className="mt-3 text-center text-xs text-gray-500">A preview of the tools available in your JobTrack workspace.</p>
                         </div>
                     </div>
                 </section>
 
-                {/* Features */}
-                <section className="border-t border-slate-100 bg-slate-50/70">
-                    <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-24">
-
-                        <div className="mx-auto mb-14 max-w-2xl text-center">
-                            <span className="text-xs font-bold uppercase tracking-[0.2em] text-indigo-600">
-                                Everything in one place
-                            </span>
-
-                            <h3 className="mt-4 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
-                                Make your job search
-                                <span className="text-indigo-600"> less stressful.</span>
-                            </h3>
-
-                            <p className="mt-4 leading-7 text-slate-600">
-                                Spend less time organizing spreadsheets and
-                                more time preparing for your next opportunity.
-                            </p>
-                        </div>
-
-                        <div className="grid gap-5 md:grid-cols-3">
-                            <FeatureCard
-                                icon={<ClipboardList size={23} />}
-                                number="01"
-                                title="Track applications"
-                                description="Keep job titles, application dates, and important details organized in one convenient place."
-                            />
-
-                            <FeatureCard
-                                icon={<ChartNoAxesCombined size={23} />}
-                                number="02"
-                                title="Monitor progress"
-                                description="See which opportunities are applied, in progress, or leading toward an offer."
-                            />
-
-                            <FeatureCard
-                                icon={<Building2 size={23} />}
-                                number="03"
-                                title="Manage companies"
-                                description="Keep company information connected to your applications for easier follow-ups."
-                            />
+                <section id="features" className="scroll-mt-24 bg-white py-16 sm:py-20 lg:py-24">
+                    <div className="mx-auto max-w-7xl px-5 sm:px-8">
+                        <SectionHeading eyebrow="Tools for your job search" title="Everything you need to stay organized" description="Keep the moving parts of your search connected, from the first application to the next follow-up." />
+                        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                            {features.map(({ icon: Icon, title, description }) => (
+                                <article key={title} className="group rounded-xl border border-gray-200 bg-white p-6 transition hover:border-gray-300 hover:shadow-lg hover:shadow-slate-900/5 sm:p-7">
+                                    <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-100 text-slate-900 transition group-hover:bg-slate-900 group-hover:text-white">
+                                        <Icon size={21} aria-hidden="true" />
+                                    </span>
+                                    <h3 className="mt-5 text-base font-semibold text-slate-900">{title}</h3>
+                                    <p className="mt-2 text-sm leading-6 text-gray-600">{description}</p>
+                                </article>
+                            ))}
                         </div>
                     </div>
                 </section>
 
-                {/* Call to action */}
-                <section className="px-5 py-20 sm:px-8 sm:py-24">
-                    <div className="relative mx-auto max-w-5xl overflow-hidden rounded-[2rem] bg-slate-950 px-6 py-14 text-center sm:px-12 sm:py-20">
-                        <div className="pointer-events-none absolute -right-20 -top-32 h-72 w-72 rounded-full bg-indigo-600/30 blur-3xl" />
-                        <div className="pointer-events-none absolute -bottom-36 -left-20 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" />
+                <section id="how-it-works" className="scroll-mt-24 border-y border-gray-200 bg-gray-50 py-16 sm:py-20 lg:py-24">
+                    <div className="mx-auto max-w-7xl px-5 sm:px-8">
+                        <SectionHeading eyebrow="A simple workflow" title="From scattered details to a clear next step" description="Build a repeatable routine around your job search, one small step at a time." />
+                        <ol className="mt-10 grid gap-4 md:grid-cols-3">
+                            {steps.map((step) => (
+                                <li key={step.number} className="rounded-xl border border-gray-200 bg-white p-6 sm:p-7">
+                                    <span className="inline-flex h-9 min-w-9 items-center justify-center rounded-lg bg-slate-900 px-2 text-sm font-semibold text-white">{step.number}</span>
+                                    <h3 className="mt-5 text-base font-semibold text-slate-900">{step.title}</h3>
+                                    <p className="mt-2 text-sm leading-6 text-gray-600">{step.description}</p>
+                                </li>
+                            ))}
+                        </ol>
+                    </div>
+                </section>
 
-                        <div className="relative">
-                            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-indigo-300">
-                                <BriefcaseBusiness size={27} />
-                            </div>
-
-                            <h3 className="mx-auto mt-6 max-w-2xl text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                                Your next opportunity starts with a plan.
-                            </h3>
-
-                            <p className="mx-auto mt-4 max-w-xl leading-7 text-slate-300">
-                                Bring your job applications together and take
-                                control of your career journey with JobTrack.
+                <section id="about" className="scroll-mt-24 bg-white py-16 sm:py-20 lg:py-24">
+                    <div className="mx-auto grid max-w-7xl gap-10 px-5 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+                        <div>
+                            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">Built for early career journeys</p>
+                            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Make room for the work that moves you forward.</h2>
+                        </div>
+                        <div className="rounded-xl border border-gray-200 bg-gray-50 p-6 sm:p-8">
+                            <p className="text-base leading-7 text-gray-700">
+                                When you are a student, fresh graduate, or starting your career, each application can bring new details to manage. JobTrack gives you a practical place to organize opportunities, prepare for conversations, and reflect on your progress—without losing sight of your next step.
                             </p>
+                            <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+                                <Benefit>Keep job details easy to find</Benefit>
+                                <Benefit>Prepare for interviews with context</Benefit>
+                                <Benefit>Remember follow-ups and events</Benefit>
+                                <Benefit>Review your search in one place</Benefit>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
 
-                            <Link
-                                to="/register"
-                                className="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-4 text-sm font-bold text-indigo-700 transition hover:-translate-y-1 hover:bg-indigo-50"
-                            >
-                                Create your account
-                                <ArrowRight size={17} />
+                <section className="px-5 pb-16 sm:px-8 sm:pb-20 lg:pb-24">
+                    <div className="mx-auto max-w-7xl overflow-hidden rounded-xl bg-slate-900 px-6 py-12 text-center sm:px-12 sm:py-16">
+                        <h2 className="mx-auto max-w-2xl text-3xl font-bold tracking-tight text-white sm:text-4xl">Give your job search a little more structure.</h2>
+                        <p className="mx-auto mt-4 max-w-xl text-base leading-7 text-gray-300">Create your JobTrack account and bring your opportunities, interviews, and follow-ups together.</p>
+                        <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
+                            <Link to="/register" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
+                                Get started <ArrowRight size={17} aria-hidden="true" />
                             </Link>
-
-                            <p className="mt-4 text-xs text-slate-400">
-                                Already have an account?{" "}
-                                <Link
-                                    to="/login"
-                                    className="font-semibold text-white underline decoration-white/40 underline-offset-4 hover:decoration-white"
-                                >
-                                    Log in
-                                </Link>
-                            </p>
+                            <Link to="/login" className="inline-flex min-h-12 items-center justify-center rounded-lg border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">Log in</Link>
                         </div>
                     </div>
                 </section>
             </main>
 
-            {/* Footer */}
-            <footer className="border-t border-slate-200 bg-white">
-                <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-7 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-                    <Link to="/" className="flex items-center gap-2">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">
-                            <BriefcaseBusiness size={16} />
-                        </div>
-                        <span className="font-extrabold tracking-tight text-slate-900">
-                            JobTrack<span className="text-indigo-600">.</span>
-                        </span>
+            <footer className="border-t border-gray-200 bg-white">
+                <div className="mx-auto flex max-w-7xl flex-col gap-6 px-5 py-7 sm:px-8 md:flex-row md:items-center md:justify-between">
+                    <Link to="/" className="inline-flex w-fit items-center gap-2 rounded-lg text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white"><BriefcaseBusiness size={16} aria-hidden="true" /></span>
+                        <span className="font-bold tracking-tight">JobTrack</span>
                     </Link>
-
-                    <p className="text-sm text-slate-500">
-                        Organize your search. Focus on your future.
-                    </p>
-
-                    <p className="text-xs text-slate-400">
-                        © {new Date().getFullYear()} JobTrack. All rights reserved.
-                    </p>
+                    <nav aria-label="Footer navigation" className="flex flex-wrap gap-x-5 gap-y-2 text-sm">
+                        <a href="#features" onClick={(event) => scrollToSection(event, "features")} className="text-gray-600 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900">Features</a>
+                        <a href="#how-it-works" onClick={(event) => scrollToSection(event, "how-it-works")} className="text-gray-600 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900">How it works</a>
+                        <Link to="/login" className="text-gray-600 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900">Log in</Link>
+                        <Link to="/register" className="text-gray-600 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900">Create account</Link>
+                    </nav>
+                    <p className="text-xs text-gray-500">© {new Date().getFullYear()} JobTrack</p>
                 </div>
             </footer>
         </div>
     );
 }
 
-function FeatureCard({ icon, number, title, description }) {
+function PreviewStat({ icon: Icon, label, className = "" }) {
     return (
-        <div className="group rounded-2xl border border-slate-200/80 bg-white p-7 transition duration-300 hover:-translate-y-1 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-950/5 sm:p-8">
-            <div className="flex items-start justify-between">
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600 transition group-hover:bg-indigo-600 group-hover:text-white">
-                    {icon}
-                </div>
-                <span className="text-sm font-bold tracking-widest text-slate-300">
-                    {number}
-                </span>
+        <div className={`rounded-lg border border-gray-200 bg-gray-50 p-3 sm:p-4 ${className}`}>
+            <div className="flex items-center gap-2 text-slate-700">
+                <Icon size={17} aria-hidden="true" />
+                <span className="text-xs font-medium">{label}</span>
             </div>
-
-            <h4 className="mt-6 text-lg font-bold text-slate-900">
-                {title}
-            </h4>
-
-            <p className="mt-3 text-sm leading-7 text-slate-600">
-                {description}
-            </p>
+            <p className="mt-3 text-sm font-semibold text-gray-500">Your {label.toLowerCase()}</p>
         </div>
+    );
+}
+
+function SectionHeading({ eyebrow, title, description }) {
+    return (
+        <div className="mx-auto max-w-2xl text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">{eyebrow}</p>
+            <h2 className="mt-3 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">{title}</h2>
+            <p className="mt-4 text-base leading-7 text-gray-600">{description}</p>
+        </div>
+    );
+}
+
+function Benefit({ children }) {
+    return (
+        <li className="flex items-start gap-2 text-sm leading-6 text-gray-700">
+            <Check size={17} className="mt-0.5 shrink-0 text-blue-700" aria-hidden="true" />
+            <span>{children}</span>
+        </li>
     );
 }
 

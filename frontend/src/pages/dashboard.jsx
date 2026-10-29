@@ -9,12 +9,15 @@ import {
     ExternalLink,
 } from "lucide-react";
 import { API_BASE_URL } from "../config/api";
+import { useAuth } from "../context/AuthContext";
 
 function Dashboard() {
     const navigate = useNavigate();
+    const { user } = useAuth();
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [applications, setApplications] = useState([]);
+    const [nextEvent, setNextEvent] = useState(null);
 
     useEffect(() => {
     const token = localStorage.getItem("token");
@@ -62,11 +65,23 @@ function Dashboard() {
         .finally(() => {
             setLoading(false);
         });
-}, []);
 
-    const companiesWithWebsite = companies.filter(
-        (company) => company.website
-    );
+    fetch(`${API_BASE_URL}/interviews`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+        },
+    })
+        .then(async (response) => {
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || "Failed to fetch events.");
+            const upcoming = (data.events || []).filter((event) =>
+                ["scheduled", "rescheduled"].includes(event.status) && new Date(event.starts_at) >= new Date()
+            );
+            setNextEvent(upcoming[0] || null);
+        })
+        .catch((error) => console.error("Could not load upcoming event:", error));
+}, []);
 
     const companiesWithLocation = companies.filter(
         (company) => company.location
@@ -178,6 +193,13 @@ function Dashboard() {
                 </div>
 
             </div>
+
+            {nextEvent && (
+                <button type="button" onClick={() => navigate(`/interviews?event_id=${nextEvent.id}`)} className="mb-8 flex w-full flex-wrap items-center justify-between gap-3 rounded-xl border border-blue-200 bg-blue-50 p-5 text-left hover:bg-blue-100">
+                    <span><span className="block text-xs font-medium uppercase text-blue-700">Next recruitment event</span><span className="mt-1 block font-semibold text-slate-900">{nextEvent.event_type} · {nextEvent.application?.job_title} at {nextEvent.application?.company?.name}</span></span>
+                    <span className="text-sm text-slate-700">{new Date(nextEvent.starts_at).toLocaleString(undefined, { timeZone: user?.timezone || nextEvent.timezone || "UTC" })}</span>
+                </button>
+            )}
 
             {/* Company List */}
             <div className="bg-white border border-gray-200 rounded-xl ">

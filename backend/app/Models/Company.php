@@ -12,6 +12,8 @@ class Company extends Model
             'notes',
             'website',
             'location',
+            'application_instructions',
+            'recruitment_notes',
         ];
 
     public function applications(){
@@ -21,5 +23,10 @@ class Company extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function researchEntries()
+    {
+        return $this->hasMany(CompanyResearchEntry::class)->latest();
     }
 }

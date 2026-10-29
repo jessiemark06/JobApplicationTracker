@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     CalendarDays,
@@ -39,15 +39,12 @@ function Applications() {
     const [companies, setCompanies] = useState([]);
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("All");
-    const [loading, setLoading] = useState(true);
+    const [loadedToken, setLoadedToken] = useState({});
+    const loading = loadedToken !== token;
     const [error, setError] = useState("");
 
     // Load applications and companies
-    const loadData = async () => {
-        setLoading(true);
-        setError("");
-
-        try {
+    const loadData = useCallback(async (signal) => {
             const headers = {
                 Authorization: `Bearer ${token}`,
                 Accept: "application/json",
@@ -58,6 +55,7 @@ function Applications() {
                 `${API_BASE_URL}/applications`,
                 {
                     headers,
+                    signal,
                 }
             );
 
@@ -67,17 +65,12 @@ function Applications() {
 
             const applicationsData = await applicationsResponse.json();
 
-            setApplications(
-                Array.isArray(applicationsData.applications)
-                    ? applicationsData.applications
-                    : []
-            );
-
             // Get companies
             const companiesResponse = await fetch(
                 `${API_BASE_URL}/companies`,
                 {
                     headers,
+                    signal,
                 }
             );
 
@@ -87,23 +80,46 @@ function Applications() {
 
             const companiesData = await companiesResponse.json();
 
-            setCompanies(
-                Array.isArray(companiesData.companies)
+            return {
+                applications: Array.isArray(applicationsData.applications)
+                    ? applicationsData.applications
+                    : [],
+                companies: Array.isArray(companiesData.companies)
                     ? companiesData.companies
-                    : []
-            );
-        } catch (loadError) {
-            setError(
-                loadError.message || "Failed to load applications."
-            );
-        } finally {
-            setLoading(false);
-        }
-    };
+                    : [],
+            };
+    }, [token]);
 
     useEffect(() => {
-        loadData();
-    }, [token]);
+        const controller = new AbortController();
+
+        async function fetchData() {
+            try {
+                const data = await loadData(controller.signal);
+                if (controller.signal.aborted) {
+                    return;
+                }
+
+                setApplications(data.applications);
+                setCompanies(data.companies);
+                setError("");
+            } catch (loadError) {
+                if (!controller.signal.aborted) {
+                    setError(
+                        loadError.message || "Failed to load applications."
+                    );
+                }
+            } finally {
+                if (!controller.signal.aborted) {
+                    setLoadedToken(token);
+                }
+            }
+        }
+
+        fetchData();
+
+        return () => controller.abort();
+    }, [loadData, token]);
 
     // Search and status filter
     const filteredApplications = applications.filter((application) => {

@@ -1,169 +1,174 @@
 <?php
 
 namespace App\Http\Controllers;
-use App\Models\Company;
+
 use App\Models\Application;
+use App\Models\ApplicationStatusHistory;
+use App\Models\Company;
+use App\Services\UserNotificationService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ApplicationController extends Controller
-{ 
+{
     public function index(Request $request)
     {
         $applications = Application::with('company')
-        ->whereHas('company', function ($query) use ($request){
-        $query->where('user_id', $request->user()->id);
-        })->get();
-           
-        return response()->json([
-            'applications' => $applications
-        ]);
+            ->whereHas('company', fn ($query) => $query->where('user_id', $request->user()->id))
+            ->get();
+
+        return response()->json(['applications' => $applications]);
     }
- 
+
     public function store(Request $request)
     {
-         $request->validate([
-            'company_id' => 'required|exists:companies,id',
-            'job_title' => 'required|string|max:255',
-            'status' => 'required|string|max:50',
-            'applied_at' => 'nullable|date',
-            'job_url' => 'nullable|url|max:255',
-            'contact_name' => 'nullable|string|max:255',
-            'contact_role' => 'nullable|string|max:255',
-            'contact_email' => 'nullable|email|max:255',
-            'contact_phone' => 'nullable|string|max:50',
-            'notes' => 'nullable|string',
-        ]);
-
-               $company = Company::where('id', $request->company_id)
+        $data = $this->validatedApplication($request);
+        $company = Company::where('id', $data['company_id'])
             ->where('user_id', $request->user()->id)
             ->first();
 
         if (!$company) {
-            return response()->json([
-                'message' => 'Company not found'
-            ], 404);
+            return response()->json(['message' => 'Company not found'], 404);
         }
 
-        $application = Application::create([
-            'company_id' => $request->company_id,
-            'job_title' => $request->job_title,
-            'status' => $request->status,
-            'applied_at' => $request->applied_at,
-            'job_url' => $request->job_url,
-            'contact_name' => $request->contact_name,
-            'contact_role' => $request->contact_role,
-            'contact_email' => $request->contact_email,
-            'contact_phone' => $request->contact_phone,
-            'notes' => $request->notes,
-        ]);
+        $statusNote = $data['status_note'] ?? null;
+        unset($data['status_note']);
+        $application = DB::transaction(function () use ($data, $statusNote) {
+            $application = Application::create($data);
+            ApplicationStatusHistory::create([
+                'application_id' => $application->id,
+                'new_status' => $application->status,
+                'notes' => $statusNote,
+                'recorded_at' => now(),
+            ]);
 
+            return $application;
+        });
 
         $application->load('company');
 
         return response()->json([
             'message' => 'Application created successfully',
-            'application' => $application
+            'application' => $application,
         ], 201);
     }
- 
-    public function show(Request $request, $id)
+
+    public function show(Request $request, int $id)
     {
-        $application = Application::with('company')
-            ->where('id', $id)
-            ->whereHas('company', function ($query) use ($request) {
-                $query->where('user_id', $request->user()->id);
-            })
+        $application = $this->ownedApplications($request)
+            ->with(['company', 'statusHistory', 'documents', 'recruitmentEvents.histories'])
+            ->whereKey($id)
             ->first();
 
         if (!$application) {
-            return response()->json([
-                'message' => 'Application not found'
-            ], 404);
+            return response()->json(['message' => 'Application not found'], 404);
         }
 
+        return response()->json(['application' => $application]);
+    }
+
+    public function update(Request $request, int $id)
+    {
+        $data = $this->validatedApplication($request);
+        $application = $this->ownedApplications($request)->whereKey($id)->first();
+
+        if (!$application) {
+            return response()->json(['message' => 'Application not found'], 404);
+        }
+
+        $company = Company::where('id', $data['company_id'])
+            ->where('user_id', $request->user()->id)
+            ->first();
+
+        if (!$company) {
+            return response()->json(['message' => 'Company not found'], 404);
+        }
+        $ownerId = $company->user_id;
+
+        $statusNote = $data['status_note'] ?? null;
+        unset($data['status_note']);
+        $statusNotification = null;
+        DB::transaction(function () use ($application, $data, $statusNote, $ownerId, &$statusNotification) {
+            $previousStatus = $application->status;
+            $application->update($data);
+
+            if ($previousStatus !== $application->status) {
+                ApplicationStatusHistory::create([
+                    'application_id' => $application->id,
+                    'previous_status' => $previousStatus,
+                    'new_status' => $application->status,
+                    'notes' => $statusNote,
+                    'recorded_at' => now(),
+                ]);
+                $statusNotification = app(UserNotificationService::class)->create(
+                    $ownerId,
+                    'application_update',
+                    $application->status === 'Offer' ? 'Offer status recorded' : 'Application status updated',
+                    "{$application->job_title} status changed from {$previousStatus} to {$application->status}.",
+                    $application->id,
+                    null,
+                    '/applications/view/'.$application->id,
+                );
+            }
+        });
+        if ($statusNotification) {
+            app(UserNotificationService::class)->sendOptionalEmail(
+                $statusNotification,
+                $request->user(),
+                'email_application_updates',
+            );
+        }
+
+        $application->load('company', 'statusHistory');
+
         return response()->json([
-            'application' => $application
+            'message' => 'Application updated successfully',
+            'application' => $application,
         ]);
     }
- 
-    public function update(Request $request, $id)
+
+    public function destroy(Request $request, int $id)
     {
-        $request->validate([
-            'company_id' => 'required|exists:companies,id',
+        $application = $this->ownedApplications($request)->with('documents')->whereKey($id)->first();
+
+        if (!$application) {
+            return response()->json(['message' => 'Application not found'], 404);
+        }
+
+        foreach ($application->documents as $document) {
+            $disk = Storage::disk($document->disk);
+            if ($disk->exists($document->path) && !$disk->delete($document->path)) {
+                return response()->json(['message' => 'An application document could not be deleted'], 500);
+            }
+        }
+
+        $application->delete();
+
+        return response()->json(['message' => 'Application deleted successfully']);
+    }
+
+    private function ownedApplications(Request $request)
+    {
+        return Application::whereHas('company', fn ($query) => $query->where('user_id', $request->user()->id));
+    }
+
+    private function validatedApplication(Request $request): array
+    {
+        return $request->validate([
+            'company_id' => 'required|integer|exists:companies,id',
             'job_title' => 'required|string|max:255',
             'status' => 'required|string|max:50',
+            'status_note' => 'nullable|string|max:10000',
             'applied_at' => 'nullable|date',
             'job_url' => 'nullable|url|max:255',
+            'source' => 'nullable|string|max:255',
+            'job_description' => 'nullable|string',
             'contact_name' => 'nullable|string|max:255',
             'contact_role' => 'nullable|string|max:255',
             'contact_email' => 'nullable|email|max:255',
             'contact_phone' => 'nullable|string|max:50',
             'notes' => 'nullable|string',
-        ]);
-
-        // Check if the application belongs to the logged-in user
-        $application = Application::where('id', $id)
-            ->whereHas('company', function ($query) use ($request) {
-                $query->where('user_id', $request->user()->id);
-            })
-            ->first();
-
-        if (!$application) {
-            return response()->json([
-                'message' => 'Application not found'
-            ], 404);
-        }
-
-        // Check if the new company belongs to the logged-in user
-        $company = Company::where('id', $request->company_id)
-            ->where('user_id', $request->user()->id)
-            ->first();
-
-        if (!$company) {
-            return response()->json([
-                'message' => 'Company not found'
-            ], 404);
-        }
-
-        $application->update([
-            'company_id' => $request->company_id,
-            'job_title' => $request->job_title,
-            'status' => $request->status,
-            'applied_at' => $request->applied_at,
-            'job_url' => $request->job_url,
-            'contact_name' => $request->contact_name,
-            'contact_role' => $request->contact_role,
-            'contact_email' => $request->contact_email,
-            'contact_phone' => $request->contact_phone,
-            'notes' => $request->notes,
-        ]);
-
-        $application->load('company');
-
-        return response()->json([
-            'message' => 'Application updated successfully',
-            'application' => $application
-        ]);
-    }
-
-     public function destroy(Request $request, $id)
-    {
-        $application = Application::where('id', $id)
-            ->whereHas('company', function ($query) use ($request) {
-                $query->where('user_id', $request->user()->id);
-            })
-            ->first();
-
-        if (!$application) {
-            return response()->json([
-                'message' => 'Application not found'
-            ], 404);
-        }
-
-        $application->delete();
-
-        return response()->json([
-            'message' => 'Application deleted successfully'
         ]);
     }
 }

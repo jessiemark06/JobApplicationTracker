@@ -25,6 +25,99 @@ MAIL_FROM_NAME="JobTrack"
 
 Use the SMTP host, port, credentials, and sender address supplied by your email provider. After changing environment settings, run `php artisan config:clear` from `backend/`. Verification links are signed and expire after 60 minutes.
 
+## JobTrack advanced features
+
+The advanced tracker features use an additive migration; existing company and
+application rows are retained, and historical status entries are created only
+for applications created or changed after the migration.
+
+From `backend/`, back up the database and run:
+
+```sh
+php artisan migrate
+php artisan config:clear
+```
+
+The migration adds application source and saved job-description fields, company
+recruitment fields, and tables for status history, follow-ups, skills, saved job
+requirements, private application documents, and private company research.
+Document uploads accept PDF, DOC, DOCX, and TXT files up to 10 MB. Files use
+Laravel's private `local` disk under `storage/app/private`; downloads require
+authentication and are checked against the owning user. Do not move these files
+to the public disk unless authenticated download authorization remains enforced.
+
+The frontend exposes analytics, follow-ups, skills and target-job comparisons
+under **Career tools**. Application history and private documents appear on each
+application detail page; personal company research appears on the company detail
+page. Skill extraction is manual, and keyword matches are not a qualification
+assessment. Follow-up messages are editable/copyable only and are never sent
+automatically.
+
+To run validation:
+
+```sh
+php artisan test
+```
+
+From `frontend/`, run `npm run lint` and `npm run build`.
+
+## Interviews, reminders, account settings, and email
+
+The interview/event and account features are added by the incremental migration
+`2026_10_29_160000_add_interview_events_and_account_preferences.php`. After
+backing up the database, run `php artisan migrate` from `backend/`. This creates
+the recruitment event/history, user notification, and reminder-delivery tables,
+and adds only time-zone and preference columns to users.
+
+The authenticated **Interviews & Events** page records interview and recruitment
+dates against owned applications. Rescheduling and cancellation are retained in
+event history. In-app event and follow-up reminders are deduplicated in the
+database, and cancelled events are excluded. Application status remains
+user-controlled.
+
+The Laravel scheduler registers `jobtrack:process-reminders` every minute. For
+local development, run this from `backend/` in a dedicated terminal:
+
+```sh
+php artisan schedule:work
+```
+
+You can process due reminders once for testing with:
+
+```sh
+php artisan jobtrack:process-reminders
+```
+
+Production hosting must invoke Laravel's scheduler once per minute, for example
+with a cron entry:
+
+```cron
+* * * * * cd /path/to/backend && php artisan schedule:run >> /dev/null 2>&1
+```
+
+Configure the host's cron facility (such as Hostinger's cron jobs) and verify
+the task's run history. The application does not claim automatic reminders are
+active until this external scheduler is configured. The in-app UI may refresh
+its notification count, but reminder generation is server-side.
+
+Users opt in to email delivery separately for interviews, recruitment deadlines,
+follow-ups, and application updates. Only verified account email addresses are
+eligible. Use the existing Laravel mail environment settings
+(`MAIL_MAILER`, `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`,
+`MAIL_SCHEME`, `MAIL_FROM_ADDRESS`, and `MAIL_FROM_NAME`) and keep secrets only
+in the deployment environment, never in source control. `FRONTEND_URL` is used
+to form links back to JobTrack. With `MAIL_MAILER=log` or `array`, the reminder
+system records an email preview status and does not send a real email; configure
+and test a dedicated provider before opting in to production delivery. Delivery
+failures are recorded without removing the corresponding in-app notification.
+
+The **Profile & settings** page stores the preferred IANA time zone, default
+event reminder intervals, and opt-in email preferences. Changing an email
+address requires verification again. Password changes require the current
+password, enforce the framework's minimum eight-character policy, hash the new
+password, and revoke other personal access tokens. Password reset remains a
+separate authentication workflow.
+
 ## About Laravel
 
 Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:

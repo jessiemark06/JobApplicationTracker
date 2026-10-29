@@ -13,6 +13,8 @@ function AddCompany() {
         location: "",
         website: "",
         notes: "",
+        application_instructions: "",
+        recruitment_notes: "",
     });
 
     const [loading, setLoading] = useState(false);
@@ -44,6 +46,8 @@ function AddCompany() {
                     location: data.company.location || "",
                     website: data.company.website || "",
                     notes: data.company.notes || "",
+                    application_instructions: data.company.application_instructions || "",
+                    recruitment_notes: data.company.recruitment_notes || "",
                 });
             } catch (loadError) {
                 setError(loadError.message || "Failed to load company.");
@@ -95,7 +99,7 @@ function AddCompany() {
 
             navigate(editing ? "/companies" : "/dashboard");
 
-        } catch (error) {
+        } catch {
             setError("Something went wrong. Please try again.");
         } finally {
             setLoading(false);
@@ -269,6 +273,16 @@ function AddCompany() {
                                     focus:border-blue-500
                                 "
                             />
+                        </div>
+
+                        <div>
+                            <label htmlFor="application_instructions" className="block text-sm font-medium text-gray-700 mb-1.5">Application instructions</label>
+                            <textarea id="application_instructions" name="application_instructions" value={formData.application_instructions} onChange={handleChange} rows="3" className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                        </div>
+
+                        <div>
+                            <label htmlFor="recruitment_notes" className="block text-sm font-medium text-gray-700 mb-1.5">Recruitment notes</label>
+                            <textarea id="recruitment_notes" name="recruitment_notes" value={formData.recruitment_notes} onChange={handleChange} rows="3" className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" />
                         </div>
 
                         {/* Buttons */}

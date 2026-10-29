@@ -4,8 +4,6 @@ import {
     Building2,
     Eye,
     ExternalLink,
-    Globe,
-    MapPin,
     Pencil,
     Plus,
     Search,
@@ -66,8 +64,6 @@ function Companies() {
     const filteredCompanies = companies.filter((company) =>
         company.name.toLowerCase().includes(search.trim().toLowerCase())
     );
-    const companiesWithWebsite = companies.filter((company) => company.website);
-    const companiesWithLocation = companies.filter((company) => company.location);
 
     const handleDelete = async (company) => {
         if (!window.confirm(`Delete ${company.name}?`)) return;

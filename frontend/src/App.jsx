@@ -12,6 +12,10 @@ import AddCompany from "./pages/AddCompany";
 import CompanyDetails from "./pages/CompanyDetails";
 import Register from "./pages/Register";
 import AdminUsers from "./pages/AdminUsers";
+import CareerTools from "./pages/CareerTools";
+import Interviews from "./pages/Interviews";
+import Notifications from "./pages/Notifications";
+import Profile from "./pages/Profile";
 import { useAuth } from "./context/AuthContext";
 
 function AdminRoute({ children }) {
@@ -81,6 +85,46 @@ function App() {
                         <ProtectedRoute>
                             <Layout>
                                 <Applications />
+                            </Layout>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/career-tools"
+                    element={
+                        <ProtectedRoute>
+                            <Layout>
+                                <CareerTools />
+                            </Layout>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/interviews"
+                    element={
+                        <ProtectedRoute>
+                            <Layout>
+                                <Interviews />
+                            </Layout>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/notifications"
+                    element={
+                        <ProtectedRoute>
+                            <Layout>
+                                <Notifications />
+                            </Layout>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/profile"
+                    element={
+                        <ProtectedRoute>
+                            <Layout>
+                                <Profile />
                             </Layout>
                         </ProtectedRoute>
                     }

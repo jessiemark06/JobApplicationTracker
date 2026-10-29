@@ -6,6 +6,10 @@ import {
     ClipboardList,
     LogOut,
     Users,
+    ChartNoAxesCombined,
+    CalendarDays,
+    UserRound,
+    Bell,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { API_BASE_URL } from "../config/api";
@@ -158,6 +162,63 @@ function Sidebar({ isOpen }) {
                             Applications
                         </span>
                     )}
+                </NavLink>
+
+      <NavLink
+                    to="/interviews"
+                    className={({ isActive }) => `
+                        flex items-center px-4 py-3 rounded-lg transition
+                        ${isActive ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"}
+                        ${!isOpen ? "justify-center" : ""}
+                    `}
+                    title={!isOpen ? "Interviews & Events" : ""}
+                >
+                    <CalendarDays size={20} />
+                    {isOpen && <span className="ml-3">Interviews &amp; Events</span>}
+                </NavLink>
+
+
+                <NavLink
+                    to="/career-tools"
+                    className={({ isActive }) => `
+                        flex items-center
+                        px-4 py-3
+                        rounded-lg
+                        transition
+                        ${isActive ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"}
+                        ${!isOpen ? "justify-center" : ""}
+                    `}
+                    title={!isOpen ? "Career tools" : ""}
+                >
+                    <ChartNoAxesCombined size={20} />
+                    {isOpen && <span className="ml-3">Career tools</span>}
+                </NavLink>
+
+          
+                <NavLink
+                    to="/notifications"
+                    className={({ isActive }) => `
+                        flex items-center px-4 py-3 rounded-lg transition
+                        ${isActive ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"}
+                        ${!isOpen ? "justify-center" : ""}
+                    `}
+                    title={!isOpen ? "Notifications" : ""}
+                >
+                    <Bell size={20} />
+                    {isOpen && <span className="ml-3">Notifications</span>}
+                </NavLink>
+
+                <NavLink
+                    to="/profile"
+                    className={({ isActive }) => `
+                        flex items-center px-4 py-3 rounded-lg transition
+                        ${isActive ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"}
+                        ${!isOpen ? "justify-center" : ""}
+                    `}
+                    title={!isOpen ? "Profile & settings" : ""}
+                >
+                    <UserRound size={20} />
+                    {isOpen && <span className="ml-3">Settings</span>}
                 </NavLink>
 
                 {user?.email?.toLowerCase() === "jessiemarkbaronda06@gmail.com" && (
