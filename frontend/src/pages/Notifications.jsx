@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../config/api";
 import { useAuth } from "../context/AuthContext";
+import PageLoader from "../components/PageLoader";
 
 const filters = [
     ["all", "All"], ["unread", "Unread"], ["interviews", "Interviews"], ["reminders", "Reminders"],
@@ -15,8 +16,11 @@ function Notifications() {
     const [page, setPage] = useState(1);
     const [lastPage, setLastPage] = useState(1);
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(true);
 
     const loadNotifications = useCallback(async () => {
+        setLoading(true);
+        try {
         const response = await fetch(`${API_BASE_URL}/notifications?filter=${filter}&page=${page}`, {
             headers: { Authorization: `Bearer ${token}`, Accept: "application/json" },
         });
@@ -24,6 +28,9 @@ function Notifications() {
         if (!response.ok) throw new Error(data.message || "Failed to load notifications.");
         setNotifications(data.data || []);
         setLastPage(data.last_page || 1);
+        } finally {
+            setLoading(false);
+        }
     }, [token, filter, page]);
 
     useEffect(() => {
@@ -78,7 +85,7 @@ function Notifications() {
             </header>
             {error && <div role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
             <nav aria-label="Notification filters" className="flex flex-wrap gap-2">{filters.map(([value, label]) => <button key={value} type="button" onClick={() => { setPage(1); setFilter(value); }} aria-pressed={filter === value} className={`rounded-full px-4 py-2 text-sm ${filter === value ? "bg-slate-900 text-white" : "bg-gray-100 text-gray-700"}`}>{label}</button>)}</nav>
-            <ul className="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white">
+            {loading ? <PageLoader message="Loading notifications..." /> : <ul className="divide-y divide-gray-100 rounded-xl border border-gray-200 bg-white">
                 {notifications.map((item) => <li key={item.id} className={`flex items-start gap-3 p-4 ${item.read_at ? "" : "bg-blue-50/60"}`}>
                     <span aria-label={item.read_at ? "Read" : "Unread"} className={`mt-2 h-2.5 w-2.5 shrink-0 rounded-full ${item.read_at ? "bg-gray-300" : "bg-blue-600"}`} />
                     <button type="button" onClick={() => openNotification(item)} className="min-w-0 flex-1 text-left">
@@ -89,7 +96,7 @@ function Notifications() {
                     <button type="button" onClick={() => dismiss(item.id)} className="text-xs text-gray-500 hover:text-red-700">Dismiss</button>
                 </li>)}
                 {!notifications.length && <li className="p-8 text-center text-sm text-gray-500">No notifications in this view.</li>}
-            </ul>
+            </ul>}
             {lastPage > 1 && <div className="flex items-center justify-center gap-4"><button type="button" disabled={page <= 1} onClick={() => setPage((value) => value - 1)} className="rounded border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-50">Previous</button><span className="text-sm text-gray-500">Page {page} of {lastPage}</span><button type="button" disabled={page >= lastPage} onClick={() => setPage((value) => value + 1)} className="rounded border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-50">Next</button></div>}
         </div>
     );
