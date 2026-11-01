@@ -36,14 +36,20 @@ function AddApplication() {
         async function loadFormData() {
             try {
                 const headers = { Authorization: `Bearer ${token}`, Accept: "application/json" };
-                const companiesResponse = await fetch(`${API_BASE_URL}/companies`, { headers });
+                const companiesRequest = fetch(`${API_BASE_URL}/companies`, { headers });
+                const applicationRequest = editing
+                    ? fetch(`${API_BASE_URL}/applications/${id}`, { headers })
+                    : null;
+                const [companiesResponse, applicationResponse] = await Promise.all([
+                    companiesRequest,
+                    applicationRequest,
+                ]);
                 const companiesData = await companiesResponse.json();
                 if (!companiesResponse.ok) throw new Error(companiesData.message || "Failed to load companies.");
                 const loadedCompanies = Array.isArray(companiesData.companies) ? companiesData.companies : [];
                 setCompanies(loadedCompanies);
 
                 if (editing) {
-                    const applicationResponse = await fetch(`${API_BASE_URL}/applications/${id}`, { headers });
                     const applicationData = await applicationResponse.json();
                     if (!applicationResponse.ok) throw new Error(applicationData.message || "Failed to load application.");
                     const application = applicationData.application;

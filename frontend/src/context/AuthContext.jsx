@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { API_BASE_URL } from "../config/api";
 
 const AuthContext = createContext();
@@ -6,7 +6,10 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
 
     const [token, setToken] = useState(
-        localStorage.getItem("token")
+        sessionStorage.getItem("token")
+    );
+    const [isLoading, setIsLoading] = useState(
+        () => Boolean(sessionStorage.getItem("token"))
     );
     const [user, setUser] = useState(() => {
         try {
@@ -18,7 +21,36 @@ export function AuthProvider({ children }) {
     });
 
 
-    //login
+    useEffect(() => {
+        const storedToken = sessionStorage.getItem("token");
+
+        if (!storedToken) {
+            return;
+        }
+
+        fetch(`${API_BASE_URL}/profile`, {
+            headers: {
+                Authorization: `Bearer ${storedToken}`,
+                Accept: "application/json",
+            },
+        })
+            .then(async (response) => {
+                if (!response.ok) {
+                    throw new Error("Session expired");
+                }
+
+                return response.json();
+            })
+            .then((data) => setUser(data.user || data))
+            .catch(() => {
+                sessionStorage.removeItem("token");
+                localStorage.removeItem("user");
+                setToken(null);
+                setUser(null);
+            })
+            .finally(() => setIsLoading(false));
+    }, []);
+
     const login = async (email, password) => {
 
         const response = await fetch(
@@ -44,7 +76,7 @@ export function AuthProvider({ children }) {
             throw new Error(data.message || "Login failed");
         }
 
-        localStorage.setItem("token", data.token);
+        sessionStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
         setToken(data.token);
@@ -53,7 +85,7 @@ export function AuthProvider({ children }) {
 
     //logout
     const logout = () => {
-        localStorage.removeItem("token");
+        sessionStorage.removeItem("token");
         localStorage.removeItem("user");
         setToken(null);
         setUser(null);
@@ -73,6 +105,7 @@ export function AuthProvider({ children }) {
                 login,
                 logout,
                 updateUser,
+                isLoading,
             }}
         >
             {children}

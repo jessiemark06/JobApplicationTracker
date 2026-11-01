@@ -12,11 +12,13 @@ function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [message, setMessage] = useState("");
+    const [loading, setLoading] = useState(false);
     const [verificationRequired, setVerificationRequired] = useState(false);
     const [resending, setResending] = useState(false);
 
     const handleLogin = async (event) => {
         event.preventDefault();
+        setLoading(true);
 
         try {
             await login(email, password);
@@ -28,6 +30,8 @@ function Login() {
         } catch (error) {
             setMessage(error.message);
             setVerificationRequired(error.message.toLowerCase().includes("verify your email"));
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -123,9 +127,10 @@ function Login() {
                         {/* Login Button */}
                         <button
                             type="submit"
-                            className="w-full rounded-lg bg-slate-900 py-3 text-sm font-medium text-white transition hover:bg-slate-800 cursor-pointer"
+                            disabled={loading}
+                            className="w-full rounded-lg bg-slate-900 py-3 text-sm font-medium text-white transition hover:bg-slate-800 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                            Login
+                            {loading ? "Signing in..." : "Login"}
                         </button>
 
                     </form>

@@ -13,14 +13,13 @@ import { useAuth } from "../context/AuthContext";
 
 function Dashboard() {
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, token } = useAuth();
     const [companies, setCompanies] = useState([]);
     const [loading, setLoading] = useState(true);
     const [applications, setApplications] = useState([]);
     const [nextEvent, setNextEvent] = useState(null);
 
     useEffect(() => {
-    const token = localStorage.getItem("token");
     // Get companies
     fetch(`${API_BASE_URL}/companies`, {
         headers: {
@@ -81,7 +80,7 @@ function Dashboard() {
             setNextEvent(upcoming[0] || null);
         })
         .catch((error) => console.error("Could not load upcoming event:", error));
-}, []);
+}, [token]);
 
     const companiesWithLocation = companies.filter(
         (company) => company.location

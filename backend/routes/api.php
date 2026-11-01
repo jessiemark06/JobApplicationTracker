@@ -11,9 +11,11 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\RecruitmentEventController;
 use App\Http\Controllers\UserNotificationController;
 
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/register', [AuthController::class, 'register'])
+        ->middleware('throttle:registration');
 
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login', [AuthController::class, 'login'])
+        ->middleware('throttle:auth');
 Route::post('/email/verification-notification', [AuthController::class, 'resendVerification'])
         ->middleware('throttle:6,1');
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { API_BASE_URL } from "../config/api";
+import PageLoader from "../components/PageLoader";
 
 const tabs = ["Analytics", "Follow-ups", "Skills & target jobs"];
 const skillStatuses = [
@@ -29,6 +30,7 @@ function CareerTools() {
     const [requirements, setRequirements] = useState([]);
     const [applications, setApplications] = useState([]);
     const [error, setError] = useState("");
+    const [loading, setLoading] = useState(true);
     const [followUpForm, setFollowUpForm] = useState({ application_id: "", scheduled_at: "", notes: "" });
     const [skillForm, setSkillForm] = useState({ name: "", status: "need_to_learn", target_date: "", evidence_url: "" });
     const [jobForm, setJobForm] = useState({ application_id: "", job_title: "", company_name: "", description: "", required_skills: "" });
@@ -50,6 +52,7 @@ function CareerTools() {
 
     const reload = useCallback(async () => {
         setError("");
+        setLoading(true);
         try {
             const params = new URLSearchParams();
             if (period === "custom") {
@@ -75,6 +78,8 @@ function CareerTools() {
             setApplications(applicationData.applications);
         } catch (loadError) {
             setError(loadError.message);
+        } finally {
+            setLoading(false);
         }
     }, [api, period, customFrom, customTo]);
 
@@ -98,6 +103,10 @@ function CareerTools() {
         }));
         return [...counts.values()].sort((first, second) => second.count - first.count);
     }, [requirements]);
+
+    if (loading && !analytics) {
+        return <PageLoader message="Loading career tools..." />;
+    }
 
     const submitFollowUp = async (event) => {
         event.preventDefault();

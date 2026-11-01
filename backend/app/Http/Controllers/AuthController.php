@@ -85,6 +85,7 @@ class AuthController extends Controller
             ], 403);
         }
 
+        $user->tokens()->delete();
         $token = $user->createToken('jobtrack-token')->plainTextToken;
 
         return response()->json([

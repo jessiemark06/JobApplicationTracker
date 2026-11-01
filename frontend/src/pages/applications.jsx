@@ -50,35 +50,16 @@ function Applications() {
                 Accept: "application/json",
             };
 
-            // Get applications
-            const applicationsResponse = await fetch(
-                `${API_BASE_URL}/applications`,
-                {
-                    headers,
-                    signal,
-                }
-            );
-
-            if (!applicationsResponse.ok) {
-                throw new Error("Failed to load applications.");
-            }
-
-            const applicationsData = await applicationsResponse.json();
-
-            // Get companies
-            const companiesResponse = await fetch(
-                `${API_BASE_URL}/companies`,
-                {
-                    headers,
-                    signal,
-                }
-            );
-
-            if (!companiesResponse.ok) {
-                throw new Error("Failed to load companies.");
-            }
-
-            const companiesData = await companiesResponse.json();
+            const [applicationsResponse, companiesResponse] = await Promise.all([
+                fetch(`${API_BASE_URL}/applications`, { headers, signal }),
+                fetch(`${API_BASE_URL}/companies`, { headers, signal }),
+            ]);
+            const [applicationsData, companiesData] = await Promise.all([
+                applicationsResponse.json(),
+                companiesResponse.json(),
+            ]);
+            if (!applicationsResponse.ok) throw new Error(applicationsData.message || "Failed to load applications.");
+            if (!companiesResponse.ok) throw new Error(companiesData.message || "Failed to load companies.");
 
             return {
                 applications: Array.isArray(applicationsData.applications)
