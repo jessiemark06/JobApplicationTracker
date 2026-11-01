@@ -50,46 +50,65 @@ function CareerTools() {
         return data;
     }, [token]);
 
-    const reload = useCallback(async () => {
-        setError("");
+    const analyticsQuery = useMemo(() => {
+        const params = new URLSearchParams();
+        if (period === "custom") {
+            if (customFrom) params.set("from", customFrom);
+            if (customTo) params.set("to", customTo);
+        } else if (period !== "all") {
+            const from = new Date();
+            from.setDate(from.getDate() - Number(period));
+            params.set("from", from.toISOString().slice(0, 10));
+            params.set("to", new Date().toISOString().slice(0, 10));
+        }
+        return params.toString();
+    }, [period, customFrom, customTo]);
+
+    const loadAnalytics = useCallback(async () => {
         setLoading(true);
         try {
-            const params = new URLSearchParams();
-            if (period === "custom") {
-                if (customFrom) params.set("from", customFrom);
-                if (customTo) params.set("to", customTo);
-            } else if (period !== "all") {
-                const from = new Date();
-                from.setDate(from.getDate() - Number(period));
-                params.set("from", from.toISOString().slice(0, 10));
-                params.set("to", new Date().toISOString().slice(0, 10));
-            }
-            const [analyticsData, followUpData, skillData, requirementData, applicationData] = await Promise.all([
-                api(`/analytics?${params.toString()}`),
-                api("/follow-ups"),
-                api("/skills"),
-                api("/job-requirements"),
-                api("/applications"),
-            ]);
-            setAnalytics(analyticsData);
-            setFollowUps(followUpData.follow_ups);
-            setSkills(skillData.skills);
-            setRequirements(requirementData.requirements);
-            setApplications(applicationData.applications);
+            setAnalytics(await api(`/analytics?${analyticsQuery}`));
         } catch (loadError) {
             setError(loadError.message);
         } finally {
             setLoading(false);
         }
-    }, [api, period, customFrom, customTo]);
+    }, [api, analyticsQuery]);
+
+    const loadSupportingData = useCallback(async () => {
+        try {
+            const [followUpData, skillData, requirementData, applicationData] = await Promise.all([
+                api("/follow-ups?per_page=30"),
+                api("/skills"),
+                api("/job-requirements"),
+                api("/applications?per_page=30"),
+            ]);
+            setFollowUps(followUpData.follow_ups || []);
+            setSkills(skillData.skills || []);
+            setRequirements(requirementData.requirements || []);
+            setApplications(applicationData.applications || []);
+        } catch (loadError) {
+            setError(loadError.message);
+        }
+    }, [api]);
+
+    const reload = useCallback(async () => {
+        await Promise.all([loadAnalytics(), loadSupportingData()]);
+    }, [loadAnalytics, loadSupportingData]);
 
     useEffect(() => {
-        async function loadCareerTools() {
-            await reload();
+        async function fetchAnalytics() {
+            await loadAnalytics();
         }
+        fetchAnalytics();
+    }, [loadAnalytics]);
 
-        loadCareerTools();
-    }, [reload]);
+    useEffect(() => {
+        async function fetchSupportingData() {
+            await loadSupportingData();
+        }
+        fetchSupportingData();
+    }, [loadSupportingData]);
 
     const requiredSkillSummary = useMemo(() => {
         const counts = new Map();
@@ -236,24 +255,26 @@ function CareerTools() {
                 <h1 className="text-2xl font-semibold text-gray-900">Career tools</h1>
                 <p className="mt-1 text-sm text-gray-500">Track progress, follow-ups, skills, and job requirements.</p>
             </div>
-            <nav aria-label="Career tools sections" className="flex flex-wrap gap-2 border-b border-gray-200">
-                {tabs.map((tab) => <button key={tab} type="button" onClick={() => setActiveTab(tab)} aria-current={activeTab === tab ? "page" : undefined} className={`px-4 py-3 text-sm font-medium ${activeTab === tab ? "border-b-2 border-slate-900 text-slate-900" : "text-gray-500 hover:text-gray-900"}`}>{tab}</button>)}
+            <nav aria-label="Career tools sections" className=" flex flex-wrap gap-2 border-b border-gray-200">
+                {tabs.map((tab) => <button key={tab} type="button" onClick={() => setActiveTab(tab)} aria-current={activeTab === tab ? "page" : undefined} className={`cursor-pointer px-4 py-3 text-sm font-medium ${activeTab === tab ? "border-b-2 border-slate-900 text-slate-900" : "text-gray-500 hover:text-gray-900"}`}>{tab}</button>)}
             </nav>
             {error && <div role="alert" className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">{error}</div>}
 
             {activeTab === "Analytics" && (
                 <section className="space-y-5">
-                    <label className="text-sm font-medium text-gray-700">Application period
-                        <select value={period} onChange={(event) => setPeriod(event.target.value)} className="ml-3 rounded-lg border border-gray-300 px-3 py-2">
-                            <option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="365">Last year</option><option value="custom">Custom range</option><option value="all">All time</option>
-                        </select>
-                    </label>
-                    {period === "custom" && <div className="inline-flex flex-wrap items-center gap-3">
-                        <label className="text-sm text-gray-700">From<input type="date" value={customFrom} onChange={(event) => setCustomFrom(event.target.value)} className="ml-2 rounded-lg border border-gray-300 px-3 py-2" /></label>
-                        <label className="text-sm text-gray-700">To<input type="date" value={customTo} onChange={(event) => setCustomTo(event.target.value)} className="ml-2 rounded-lg border border-gray-300 px-3 py-2" /></label>
-                    </div>}
+                    <div className="mb-1 flex flex-wrap items-center gap-3">
+                        <label className="text-sm font-medium text-gray-700">Application period
+                            <select value={period} onChange={(event) => setPeriod(event.target.value)} className="ml-3 cursor-pointer rounded-lg border border-gray-300 px-3 py-2">
+                                <option value="30">Last 30 days</option><option value="90">Last 90 days</option><option value="365">Last year</option><option value="custom">Custom range</option><option value="all">All time</option>
+                            </select>
+                        </label>
+                        {period === "custom" && <div className="flex flex-wrap items-center gap-3">
+                            <label className="text-sm text-gray-700">From<input type="date" value={customFrom} onChange={(event) => setCustomFrom(event.target.value)} className="ml-2 rounded-lg border border-gray-300 px-3 py-2" /></label>
+                            <label className="text-sm text-gray-700">To<input type="date" value={customTo} onChange={(event) => setCustomTo(event.target.value)} className="ml-2 rounded-lg border border-gray-300 px-3 py-2" /></label>
+                        </div>}
+                    </div>
                     {analytics && <>
-                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
                             <Metric title="Applications" value={analytics.total} note="Applications in selected period" />
                             <Metric title="Interview rate" value={`${analytics.interview_rate}%`} note={`${analytics.interview_sample} eligible applications · reached interview stage`} />
                             <Metric title="Response rate" value={`${analytics.response_rate}%`} note={`${analytics.response_sample} eligible applications · recorded response statuses`} />
@@ -285,7 +306,7 @@ function CareerTools() {
                         <label className="text-sm text-gray-700">Notes
                             <input value={followUpForm.notes} onChange={(event) => setFollowUpForm({ ...followUpForm, notes: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" />
                         </label>
-                        <button className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white md:col-span-4 md:justify-self-start">Schedule follow-up</button>
+                        <button className="cursor-pointer rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white md:col-span-4 md:justify-self-start">Schedule follow-up</button>
                     </form>
                     <div className="space-y-3">
                         {followUps.filter((followUp) => !followUp.completed_at).map((followUp) => {
@@ -336,7 +357,7 @@ function CareerTools() {
                                 <label className="text-sm text-gray-700">Target date<input type="date" value={skillForm.target_date} onChange={(event) => setSkillForm({ ...skillForm, target_date: event.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" /></label>
                             </div>
                             <label className="block text-sm text-gray-700">Portfolio / certificate evidence URL<input type="url" value={skillForm.evidence_url} onChange={(event) => setSkillForm({ ...skillForm, evidence_url: event.target.value })} placeholder="https://" className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" /></label>
-                            <button className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white">Add skill</button>
+                            <button className="cursor-pointer rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white">Add skill</button>
                         </form>
                         {skills.map((skill) => <div key={skill.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-gray-200 bg-white p-4">
                             <div className="min-w-0 flex-1"><p className="font-medium text-gray-900">{skill.name}</p>{skill.evidence_url && <a href={skill.evidence_url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-700">Evidence</a>}
@@ -364,7 +385,7 @@ function CareerTools() {
                             </div>
                             <label className="block text-sm text-gray-700">Required skills (comma separated)<input required value={jobForm.required_skills} onChange={(event) => setJobForm({ ...jobForm, required_skills: event.target.value })} placeholder="React, SQL, accessibility" className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" /></label>
                             <label className="block text-sm text-gray-700">Job description<textarea value={jobForm.description} onChange={(event) => setJobForm({ ...jobForm, description: event.target.value })} rows={3} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" /></label>
-                            <button className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white">Save target job</button>
+                            <button className="cursor-pointer rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white">Save target job</button>
                         </form>
                         <section className="rounded-xl border border-gray-200 bg-white p-5">
                             <h2 className="font-semibold text-gray-900">Most requested skills</h2>

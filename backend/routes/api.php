@@ -10,9 +10,11 @@ use App\Http\Controllers\CareerToolsController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\RecruitmentEventController;
 use App\Http\Controllers\UserNotificationController;
+use App\Http\Controllers\PrivacyController;
 
 Route::post('/register', [AuthController::class, 'register'])
         ->middleware('throttle:registration');
+Route::get('/agreements', [PrivacyController::class, 'agreements']);
 
 Route::post('/login', [AuthController::class, 'login'])
         ->middleware('throttle:auth');
@@ -26,6 +28,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/profile', [AccountController::class, 'show']);
         Route::put('/profile', [AccountController::class, 'update'])->middleware('throttle:10,1');
         Route::put('/profile/password', [AccountController::class, 'changePassword'])->middleware('throttle:5,1');
+        Route::get('/privacy/consents', [PrivacyController::class, 'consents']);
+        Route::post('/privacy/consents', [PrivacyController::class, 'accept'])->middleware('throttle:10,1');
+        Route::get('/privacy/export', [PrivacyController::class, 'export'])->middleware('throttle:3,1');
+        Route::delete('/privacy/account', [PrivacyController::class, 'destroyAccount'])->middleware('throttle:3,1');
 });
 
 Route::middleware(['auth:sanctum', 'verified.api'])->group(function() {

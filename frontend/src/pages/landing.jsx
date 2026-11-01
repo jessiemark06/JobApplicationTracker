@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
     ArrowDown,
@@ -16,9 +16,9 @@ import {
 } from "lucide-react";
 
 const applications = [
-    { role: "Frontend Developer", company: "Northstar Studio", status: "Interview", tone: "bg-blue-50 text-blue-700" },
-    { role: "Junior Software Engineer", company: "Fieldwork Labs", status: "Applied", tone: "bg-gray-100 text-gray-700" },
-    { role: "Product Support Associate", company: "Common Ground", status: "Screening", tone: "bg-amber-50 text-amber-700" },
+    { role: "Marketing Coordinator", company: "Northstar Studio", status: "Interview", tone: "bg-blue-50 text-blue-700" },
+    { role: "Administrative Assistant", company: "Fieldwork Labs", status: "Applied", tone: "bg-gray-100 text-gray-700" },
+    { role: "Customer Success Associate", company: "Common Ground", status: "Screening", tone: "bg-amber-50 text-amber-700" },
 ];
 
 const features = [
@@ -74,6 +74,14 @@ const steps = [
 
 function Landing() {
     const [menuOpen, setMenuOpen] = useState(false);
+    const [isScrolled, setIsScrolled] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => setIsScrolled(window.scrollY > 12);
+        handleScroll();
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
 
     const scrollToSection = (event, sectionId) => {
         event.preventDefault();
@@ -91,8 +99,8 @@ function Landing() {
     };
 
     return (
-        <div className="min-h-screen overflow-hidden bg-white font-sans text-gray-900">
-            <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur">
+        <div className="min-h-screen overflow-x-hidden bg-white font-sans text-gray-900">
+            <header className={`fixed inset-x-0 top-0 z-50 border-b bg-white/90 backdrop-blur-xl transition-shadow duration-300 ${isScrolled ? "border-gray-200 shadow-lg shadow-slate-900/10" : "border-transparent"}`}>
                 <nav aria-label="Main navigation" className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3.5 sm:px-8">
                     <Link to="/" className="flex items-center gap-3 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-slate-900">
                         <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white">
@@ -144,12 +152,15 @@ function Landing() {
                 )}
             </header>
 
-            <main>
-                <section className="bg-gray-50">
-                    <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 lg:py-24">
-                        <div>
-                            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm">
+            <main className="pt-[76px]">
+                <section className="relative isolate overflow-hidden bg-gray-50">
+                    <div className="pointer-events-none absolute -left-24 top-20 h-72 w-72 rounded-full bg-blue-200/30 blur-3xl motion-safe:animate-pulse" />
+                    <div className="pointer-events-none absolute -right-20 bottom-0 h-96 w-96 rounded-full bg-violet-200/30 blur-3xl motion-safe:animate-pulse [animation-delay:1.5s]" />
+                    <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 sm:px-8 sm:py-20 lg:grid-cols-[0.95fr_1.05fr] lg:gap-16 lg:py-24">
+                        <div className="motion-safe:animate-fade-in-up">
+                            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-100 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm">
                                 <BriefcaseBusiness size={16} aria-hidden="true" />
+                                <span className="h-2 w-2 rounded-full bg-blue-600 motion-safe:animate-pulse" />
                                 A clearer way to manage your search
                             </div>
                             <h1 className="max-w-2xl text-4xl font-bold leading-tight tracking-tight text-slate-900 sm:text-5xl lg:text-[3.5rem]">
@@ -171,8 +182,8 @@ function Landing() {
                             </p>
                         </div>
 
-                        <div aria-label="Illustrative JobTrack application dashboard preview" className="mx-auto w-full max-w-2xl">
-                            <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl shadow-slate-900/5">
+                        <div aria-label="Illustrative JobTrack application dashboard preview" className="mx-auto w-full max-w-2xl motion-safe:animate-fade-in-up [animation-delay:150ms]">
+                            <div className="motion-safe:animate-float overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl shadow-slate-900/10">
                                 <div className="flex items-center justify-between gap-3 border-b border-gray-200 bg-slate-900 px-4 py-4 text-white sm:px-6">
                                     <div className="flex items-center gap-3">
                                         <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10">
@@ -231,8 +242,8 @@ function Landing() {
                     <div className="mx-auto max-w-7xl px-5 sm:px-8">
                         <SectionHeading eyebrow="Tools for your job search" title="Everything you need to stay organized" description="Keep the moving parts of your search connected, from the first application to the next follow-up." />
                         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                            {features.map(({ icon: Icon, title, description }) => (
-                                <article key={title} className="group rounded-xl border border-gray-200 bg-white p-6 transition hover:border-gray-300 hover:shadow-lg hover:shadow-slate-900/5 sm:p-7">
+                            {features.map(({ icon: Icon, title, description }, index) => (
+                                <article key={title} style={{ animationDelay: `${index * 70}ms` }} className="group motion-safe:animate-fade-in-up rounded-xl border border-gray-200 bg-white p-6 transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-900/10 sm:p-7">
                                     <span className="flex h-11 w-11 items-center justify-center rounded-lg bg-gray-100 text-slate-900 transition group-hover:bg-slate-900 group-hover:text-white">
                                         <Icon size={21} aria-hidden="true" />
                                     </span>
@@ -248,8 +259,8 @@ function Landing() {
                     <div className="mx-auto max-w-7xl px-5 sm:px-8">
                         <SectionHeading eyebrow="A simple workflow" title="From scattered details to a clear next step" description="Build a repeatable routine around your job search, one small step at a time." />
                         <ol className="mt-10 grid gap-4 md:grid-cols-3">
-                            {steps.map((step) => (
-                                <li key={step.number} className="rounded-xl border border-gray-200 bg-white p-6 sm:p-7">
+                            {steps.map((step, index) => (
+                                <li key={step.number} style={{ animationDelay: `${index * 100}ms` }} className="motion-safe:animate-fade-in-up rounded-xl border border-gray-200 bg-white p-6 transition duration-300 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg hover:shadow-slate-900/5 sm:p-7">
                                     <span className="inline-flex h-9 min-w-9 items-center justify-center rounded-lg bg-slate-900 px-2 text-sm font-semibold text-white">{step.number}</span>
                                     <h3 className="mt-5 text-base font-semibold text-slate-900">{step.title}</h3>
                                     <p className="mt-2 text-sm leading-6 text-gray-600">{step.description}</p>

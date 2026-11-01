@@ -40,6 +40,8 @@ function Applications() {
     const [search, setSearch] = useState("");
     const [statusFilter, setStatusFilter] = useState("All");
     const [loadedToken, setLoadedToken] = useState({});
+    const [page, setPage] = useState(1);
+    const [lastPage, setLastPage] = useState(1);
     const loading = loadedToken !== token;
     const [error, setError] = useState("");
 
@@ -51,7 +53,7 @@ function Applications() {
             };
 
             const [applicationsResponse, companiesResponse] = await Promise.all([
-                fetch(`${API_BASE_URL}/applications`, { headers, signal }),
+                fetch(`${API_BASE_URL}/applications?page=${page}&per_page=30`, { headers, signal }),
                 fetch(`${API_BASE_URL}/companies`, { headers, signal }),
             ]);
             const [applicationsData, companiesData] = await Promise.all([
@@ -65,11 +67,12 @@ function Applications() {
                 applications: Array.isArray(applicationsData.applications)
                     ? applicationsData.applications
                     : [],
+                lastPage: applicationsData.pagination?.last_page || 1,
                 companies: Array.isArray(companiesData.companies)
                     ? companiesData.companies
                     : [],
             };
-    }, [token]);
+    }, [token, page]);
 
     useEffect(() => {
         const controller = new AbortController();
@@ -82,6 +85,7 @@ function Applications() {
                 }
 
                 setApplications(data.applications);
+                setLastPage(data.lastPage);
                 setCompanies(data.companies);
                 setError("");
             } catch (loadError) {
@@ -100,7 +104,7 @@ function Applications() {
         fetchData();
 
         return () => controller.abort();
-    }, [loadData, token]);
+    }, [loadData, token, page]);
 
     // Search and status filter
     const filteredApplications = applications.filter((application) => {
@@ -185,7 +189,7 @@ function Applications() {
                 <div className="flex flex-col flex flex-col p-6 border-b border-gray-200 bg-slate-900 rounded-t-lg sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h2 className="font-semibold text-white">Application pipeline</h2>
-                        <p className="mt-1 text-sm text-gray-300">{applications.length} {applications.length === 1 ? "application" : "applications"} saved</p>
+                        <p className="mt-1 text-sm text-gray-300">{applications.length} applications on this page</p>
                     </div>
                     <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
                         <label className="relative block sm:w-64">
@@ -251,6 +255,11 @@ function Applications() {
                     </div>
                 )}
             </section>
+            {lastPage > 1 && <div className="flex items-center justify-center gap-4">
+                <button type="button" disabled={page <= 1} onClick={() => setPage((current) => current - 1)} className="rounded border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-50">Previous</button>
+                <span className="text-sm text-gray-500">Page {page} of {lastPage}</span>
+                <button type="button" disabled={page >= lastPage} onClick={() => setPage((current) => current + 1)} className="rounded border border-gray-300 px-3 py-1.5 text-sm disabled:opacity-50">Next</button>
+            </div>}
         </div>
     );
 }

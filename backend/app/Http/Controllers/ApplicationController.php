@@ -16,9 +16,18 @@ class ApplicationController extends Controller
     {
         $applications = Application::with('company')
             ->whereHas('company', fn ($query) => $query->where('user_id', $request->user()->id))
-            ->get();
+            ->latest('applied_at')
+            ->paginate(max(1, min((int) $request->input('per_page', 30), 30)));
 
-        return response()->json(['applications' => $applications]);
+        return response()->json([
+            'applications' => $applications->items(),
+            'pagination' => [
+                'current_page' => $applications->currentPage(),
+                'last_page' => $applications->lastPage(),
+                'per_page' => $applications->perPage(),
+                'total' => $applications->total(),
+            ],
+        ]);
     }
 
     public function store(Request $request)

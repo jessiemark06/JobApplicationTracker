@@ -58,6 +58,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Company::class);
     }
 
+    public function userAgreements()
+    {
+        return $this->hasMany(UserAgreement::class);
+    }
+
     public function sendEmailVerificationNotification(): void
     {
         $this->notify(new VerifyJobTrackEmail());

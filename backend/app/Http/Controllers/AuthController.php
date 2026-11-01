@@ -6,22 +6,46 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Agreement;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|min:8|confirmed'
+            'password' => 'required|min:8|confirmed',
+            'agreement_slugs' => 'sometimes|array|min:1',
+            'agreement_slugs.*' => 'string|distinct',
         ]);
 
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password)
-        ]);
+        $requiredAgreements = Agreement::where('is_required', true)
+            ->whereNotNull('published_at')
+            ->where('published_at', '<=', now())
+            ->get();
+        $providedSlugs = collect($data['agreement_slugs'] ?? []);
+        if ($providedSlugs->isNotEmpty() && $requiredAgreements->contains(fn ($agreement) => !$providedSlugs->contains($agreement->slug))) {
+            return response()->json(['message' => 'You must accept all required agreements before registering.'], 422);
+        }
+
+        $user = DB::transaction(function () use ($data, $requiredAgreements, $providedSlugs, $request) {
+            $user = User::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+            ]);
+            foreach ($requiredAgreements->filter(fn ($agreement) => $providedSlugs->contains($agreement->slug)) as $agreement) {
+                $user->userAgreements()->create([
+                    'agreement_id' => $agreement->id,
+                    'accepted_at' => now(),
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                ]);
+            }
+            return $user;
+        });
 
         $user->sendEmailVerificationNotification();
 

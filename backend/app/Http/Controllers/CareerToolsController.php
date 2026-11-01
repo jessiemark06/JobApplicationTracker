@@ -12,6 +12,7 @@ use App\Models\UserSkill;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class CareerToolsController extends Controller
@@ -22,11 +23,35 @@ class CareerToolsController extends Controller
             'from' => 'nullable|date',
             'to' => 'nullable|date|after_or_equal:from',
         ]);
-        $applications = $this->ownedApplications($request)
-            ->with(['company', 'statusHistory'])
-            ->when($filters['from'] ?? null, fn ($query, $from) => $query->whereDate('applied_at', '>=', $from))
-            ->when($filters['to'] ?? null, fn ($query, $to) => $query->whereDate('applied_at', '<=', $to))
+        $baseQuery = $this->ownedApplications($request)
+            ->when($filters['from'] ?? null, fn ($query, $from) => $query->where('applied_at', '>=', $from))
+            ->when($filters['to'] ?? null, fn ($query, $to) => $query->where('applied_at', '<=', $to));
+        $applications = (clone $baseQuery)
+            ->select(['applications.id', 'applications.company_id', 'applications.job_title', 'applications.status', 'applications.applied_at', 'applications.source'])
+            ->with(['statusHistory:id,application_id,previous_status,new_status,recorded_at'])
             ->get();
+        $statusCounts = (clone $baseQuery)
+            ->select('status', DB::raw('COUNT(*) as aggregate'))
+            ->groupBy('status')
+            ->pluck('aggregate', 'status');
+        $outcomeCounts = (clone $baseQuery)
+            ->whereIn('status', ['Offer', 'Rejected', 'Withdrawn'])
+            ->select('status', DB::raw('COUNT(*) as aggregate'))
+            ->groupBy('status')
+            ->pluck('aggregate', 'status');
+        $companyCounts = (clone $baseQuery)
+            ->join('companies', 'companies.id', '=', 'applications.company_id')
+            ->select(DB::raw("COALESCE(companies.name, 'Unknown') as label"), DB::raw('COUNT(*) as aggregate'))
+            ->groupBy('companies.name')
+            ->pluck('aggregate', 'label');
+        $jobTitleCounts = (clone $baseQuery)
+            ->select('job_title', DB::raw('COUNT(*) as aggregate'))
+            ->groupBy('job_title')
+            ->pluck('aggregate', 'job_title');
+        $sourceCounts = (clone $baseQuery)
+            ->selectRaw("COALESCE(source, 'Not recorded') as label, COUNT(*) as aggregate")
+            ->groupBy('source')
+            ->pluck('aggregate', 'label');
 
         $eligible = $applications->where('status', '!=', 'Withdrawn');
         $responseStatuses = ['Screening', 'Interview', 'Offer', 'Rejected'];
@@ -76,8 +101,8 @@ class CareerToolsController extends Controller
             ->map->count();
 
         return response()->json([
-            'total' => $applications->count(),
-            'statuses' => $applications->groupBy('status')->map->count(),
+            'total' => $baseQuery->count(),
+            'statuses' => $statusCounts,
             'eligible_sample' => $eligible->count(),
             'interview_rate' => $this->rate($interviewed->count(), $eligible->count()),
             'interview_sample' => $eligible->count(),
@@ -87,11 +112,11 @@ class CareerToolsController extends Controller
             'response_time_sample' => $responseDays->count(),
             'average_stage_transition_days' => $transitionDays->isNotEmpty() ? round($transitionDays->avg(), 1) : null,
             'stage_transition_sample' => $transitionDays->count(),
-            'outcomes' => $applications->whereIn('status', ['Offer', 'Rejected', 'Withdrawn'])->groupBy('status')->map->count(),
+            'outcomes' => $outcomeCounts,
             'rejection_stages' => $rejectionStages,
-            'by_job_title' => $applications->groupBy('job_title')->map->count(),
-            'by_company' => $applications->groupBy(fn ($application) => $application->company?->name ?? 'Unknown')->map->count(),
-            'by_source' => $applications->groupBy(fn ($application) => $application->source ?: 'Not recorded')->map->count(),
+            'by_job_title' => $jobTitleCounts,
+            'by_company' => $companyCounts,
+            'by_source' => $sourceCounts,
         ]);
     }
 
@@ -100,9 +125,16 @@ class CareerToolsController extends Controller
         $followUps = FollowUp::with('application.company')
             ->whereHas('application.company', fn ($query) => $query->where('user_id', $request->user()->id))
             ->orderBy('scheduled_at')
-            ->get();
+            ->paginate(max(1, min((int) $request->input('per_page', 30), 30)));
 
-        return response()->json(['follow_ups' => $followUps]);
+        return response()->json([
+            'follow_ups' => $followUps->items(),
+            'pagination' => [
+                'current_page' => $followUps->currentPage(),
+                'last_page' => $followUps->lastPage(),
+                'total' => $followUps->total(),
+            ],
+        ]);
     }
 
     public function storeFollowUp(Request $request)

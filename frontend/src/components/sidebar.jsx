@@ -218,7 +218,7 @@ function Sidebar({ isOpen }) {
                     title={!isOpen ? "Profile & settings" : ""}
                 >
                     <UserRound size={20} />
-                    {isOpen && <span className="ml-3">Settings</span>}
+                    {isOpen && <span className="ml-3">Profile</span>}
                 </NavLink>
 
                 {user?.email?.toLowerCase() === "jessiemarkbaronda06@gmail.com" && (

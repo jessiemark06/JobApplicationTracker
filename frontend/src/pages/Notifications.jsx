@@ -81,7 +81,7 @@ function Notifications() {
         <div className="mx-auto max-w-4xl space-y-5">
             <header className="flex flex-wrap items-end justify-between gap-3">
                 <div><h1 className="text-2xl font-semibold text-gray-900">Notifications</h1><p className="mt-1 text-sm text-gray-500">Updates created from information entered in your tracker.</p></div>
-                <button type="button" onClick={markAllRead} className="rounded-lg border border-gray-300 px-3 py-2 text-sm">Mark all as read</button>
+                <button type="button" onClick={markAllRead} className="cursor-pointer rounded-lg border border-gray-300 px-3 py-2 text-sm">Mark all as read</button>
             </header>
             {error && <div role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>}
             <nav aria-label="Notification filters" className="flex flex-wrap gap-2">{filters.map(([value, label]) => <button key={value} type="button" onClick={() => { setPage(1); setFilter(value); }} aria-pressed={filter === value} className={`rounded-full px-4 py-2 text-sm ${filter === value ? "bg-slate-900 text-white" : "bg-gray-100 text-gray-700"}`}>{label}</button>)}</nav>
@@ -93,7 +93,7 @@ function Notifications() {
                         <span className="mt-1 block text-sm text-gray-600">{item.message}</span>
                         <span className="mt-1 block text-xs text-gray-500">{item.application?.company?.name ? `${item.application.company.name} · ` : ""}{new Date(item.created_at).toLocaleString()}</span>
                     </button>
-                    <button type="button" onClick={() => dismiss(item.id)} className="text-xs text-gray-500 hover:text-red-700">Dismiss</button>
+                    <button type="button" onClick={() => dismiss(item.id)} className="cursor-pointer text-xs text-gray-500 hover:text-red-700">Dismiss</button>
                 </li>)}
                 {!notifications.length && <li className="p-8 text-center text-sm text-gray-500">No notifications in this view.</li>}
             </ul>}

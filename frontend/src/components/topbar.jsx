@@ -94,7 +94,7 @@ function Topbar({ toggleSidebar }) {
 
         if (location.pathname === "/interviews") return "Interviews & Events";
         if (location.pathname === "/notifications") return "Notifications";
-        if (location.pathname === "/profile") return "Profile & settings";
+        if (location.pathname === "/profile") return "Profile";
 
         if (location.pathname === "/applications/create") {
             return "Add Application";
@@ -168,9 +168,9 @@ function Topbar({ toggleSidebar }) {
 
             {/* Right side */}
             <div className="flex items-center gap-3">
-                <button type="button" onClick={() => navigate("/notifications")} aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ""}`} className="relative rounded-lg p-2 text-slate-700 hover:bg-slate-100">
+                <button type="button" onClick={() => navigate("/notifications")} aria-label={`Notifications${unreadCount ? `, ${unreadCount} unread` : ""}`} className="cursor-pointer relative rounded-lg p-2 text-slate-700 hover:bg-slate-100">
                     <Bell size={20} />
-                    {unreadCount > 0 && <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-red-600 px-1 text-center text-xs leading-5 text-white">{unreadCount > 99 ? "99+" : unreadCount}</span>}
+                    {unreadCount > 0 && <span className="c absolute -right-1 -top-1 min-w-5 rounded-full bg-red-600 px-1 text-center text-xs leading-5 text-white">{unreadCount > 99 ? "99+" : unreadCount}</span>}
                 </button>
                 <div ref={profileRef} className="relative">
 
@@ -269,7 +269,7 @@ function Topbar({ toggleSidebar }) {
                             </div>
 
                         </div>
-                        <button type="button" onClick={() => { setShowProfile(false); navigate("/profile"); }} className="w-full rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200">Profile &amp; settings</button>
+                        <button type="button" onClick={() => { setShowProfile(false); navigate("/profile"); }} className="w-full rounded-lg bg-gray-100 px-3 py-2 text-sm font-medium text-gray-800 hover:bg-gray-200">Profile</button>
 
                     </div>
                 )}

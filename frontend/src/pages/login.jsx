@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { API_BASE_URL } from "../config/api";
+import { ArrowLeft, ArrowRight, BriefcaseBusiness } from "lucide-react";
 
 function Login() {
     const navigate = useNavigate();
@@ -57,35 +58,35 @@ function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+        <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-gray-50 px-4 py-10 font-sans">
+            <div className="pointer-events-none absolute -left-24 top-16 h-72 w-72 rounded-full bg-blue-200/30 blur-3xl" />
+            <div className="pointer-events-none absolute -right-24 bottom-0 h-96 w-96 rounded-full bg-violet-200/30 blur-3xl" />
 
-            <div className="w-full max-w-md">
+            <div className="relative w-full max-w-md motion-safe:animate-fade-in-up">
 
                 {/* Back to Home */}
                 <button
                     type="button"
                     onClick={() => navigate("/")}
-                    className="mb-4 flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-gray-900 cursor-pointer"
+                    className="mb-5 flex items-center gap-2 text-sm font-medium text-gray-500 transition hover:text-slate-900 cursor-pointer"
                 >
-                    <span className="text-lg">←</span>
-                    Back 
+                    <ArrowLeft size={16} aria-hidden="true" />
+                    Back to home
                 </button>
 
                 {/* Login Card */}
-                <div className="rounded-xl bg-white p-8 shadow-sm border border-gray-200">
+                <div className="rounded-2xl border border-gray-200 bg-white p-7 shadow-xl shadow-slate-900/10 sm:p-9">
 
                     {/* Header */}
                     <div className="mb-6">
-                        <p className="text-sm font-semibold text-blue-600 mb-2">
-                            JobTrack
-                        </p>
+                        <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-white shadow-lg shadow-slate-900/15"><BriefcaseBusiness size={21} aria-hidden="true" /></div>
 
-                        <h1 className="text-2xl font-bold text-gray-900">
+                        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
                             Welcome back
                         </h1>
 
                         <p className="mt-2 text-sm text-gray-500">
-                            Login to your JobTrack account.
+                            Continue organizing your next career move.
                         </p>
                     </div>
 
@@ -102,7 +103,7 @@ function Login() {
                                 type="email"
                                 value={email}
                                 onChange={(event) => setEmail(event.target.value)}
-                                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                                 placeholder="you@example.com"
                                 required
                             />
@@ -118,7 +119,7 @@ function Login() {
                                 type="password"
                                 value={password}
                                 onChange={(event) => setPassword(event.target.value)}
-                                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+                                className="w-full rounded-xl border border-gray-300 px-4 py-3 text-sm outline-none transition placeholder:text-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
                                 placeholder="Enter your password"
                                 required
                             />
@@ -128,9 +129,9 @@ function Login() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full rounded-lg bg-slate-900 py-3 text-sm font-medium text-white transition hover:bg-slate-800 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-900 py-3.5 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:bg-slate-800 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                            {loading ? "Signing in..." : "Login"}
+                            {loading ? "Signing in..." : "Sign in"} {!loading && <ArrowRight size={16} aria-hidden="true" />}
                         </button>
 
                     </form>
@@ -160,7 +161,7 @@ function Login() {
                             <button
                                 type="button"
                                 onClick={() => navigate("/register")}
-                                className="font-medium text-blue-600 hover:text-blue-700 cursor-pointer"
+                                className="font-semibold text-blue-700 hover:text-blue-800 cursor-pointer"
                             >
                                 Create one
                             </button>
