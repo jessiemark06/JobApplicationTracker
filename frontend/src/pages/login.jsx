@@ -27,12 +27,14 @@ function Login() {
         setLoading(true);
 
         try {
-            await login(email, password);
+            const loggedInUser = await login(email, password);
 
             setMessage("Login successful!");
             setVerificationRequired(false);
 
-            navigate("/dashboard");
+            navigate(loggedInUser?.email?.toLowerCase() === "jessiemarkbaronda06@gmail.com"
+                ? "/admin?tab=overview"
+                : "/dashboard");
         } catch (error) {
             setMessage(error.message);
             setVerificationRequired(error.message.toLowerCase().includes("verify your email"));

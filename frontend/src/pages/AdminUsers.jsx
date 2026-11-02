@@ -6,7 +6,6 @@ import {
     ClipboardList,
     Pencil,
     Search,
-    Settings,
     Trash2,
     Users,
     X,
@@ -14,11 +13,7 @@ import {
 import { useAuth } from "../context/AuthContext";
 import { API_BASE_URL } from "../config/api";
 
-const tabs = [
-    { id: "overview", label: "Overview", icon: Activity },
-    { id: "users", label: "User management", icon: Users },
-    { id: "settings", label: "System settings", icon: Settings },
-];
+const tabIds = ["overview", "users", "settings"];
 
 function Metric({ label, value, note, icon: Icon }) {
     return (
@@ -39,10 +34,10 @@ function Metric({ label, value, note, icon: Icon }) {
 
 function AdminUsers() {
     const { token, user } = useAuth();
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams] = useSearchParams();
     const [users, setUsers] = useState([]);
     const [overview, setOverview] = useState(null);
-    const activeTab = tabs.some((tab) => tab.id === searchParams.get("tab"))
+    const activeTab = tabIds.includes(searchParams.get("tab"))
         ? searchParams.get("tab")
         : "overview";
     const [search, setSearch] = useState("");
@@ -133,20 +128,6 @@ function AdminUsers() {
                 <h1 className="mt-1 text-2xl font-semibold text-gray-900">System management</h1>
                 <p className="mt-1 text-sm text-gray-500">Monitor platform performance and manage JobTrack accounts.</p>
             </div>
-
-            <nav className="flex flex-wrap gap-2 rounded-xl border border-gray-200 bg-white p-2" aria-label="Admin sections">
-                {tabs.map(({ id, label, icon: Icon }) => (
-                    <button
-                        key={id}
-                        type="button"
-                        onClick={() => setSearchParams({ tab: id })}
-                        className={`inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition ${activeTab === id ? "bg-slate-900 text-white" : "text-gray-600 hover:bg-gray-100"}`}
-                    >
-                        <Icon size={17} aria-hidden="true" />
-                        {label}
-                    </button>
-                ))}
-            </nav>
 
             {error && <p role="alert" className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>}
 

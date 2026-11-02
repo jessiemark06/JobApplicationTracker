@@ -249,7 +249,7 @@ function Landing() {
                                         {userCount === null ? "—" : userCount.toLocaleString()}
                                     </span>
                                     <span>
-                                        <span className="block text-sm font-semibold text-white">Registered users</span>
+                                        <span className="block text-sm font-semibold text-white">Current Registered users</span>
                                         <span className="block text-xs text-slate-300">Organizing their next career move</span>
                                     </span>
                                 </div>

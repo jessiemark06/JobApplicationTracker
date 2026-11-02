@@ -28,6 +28,20 @@ function AdminRoute({ children }) {
     return children;
 }
 
+function UserDashboardRoute() {
+    const { user } = useAuth();
+
+    if (user?.email?.toLowerCase() === "jessiemarkbaronda06@gmail.com") {
+        return <Navigate to="/admin?tab=overview" replace />;
+    }
+
+    return (
+        <Layout>
+            <Dashboard />
+        </Layout>
+    );
+}
+
 function App() {
     return (
         <HashRouter>
@@ -62,10 +76,7 @@ function App() {
                     path="/dashboard"
                     element={
                         <ProtectedRoute>
-                            <Layout>
-                                <Dashboard />
-                                
-                            </Layout>
+                            <UserDashboardRoute />
                         </ProtectedRoute>
                     }
                 />

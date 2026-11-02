@@ -24,6 +24,8 @@ function Sidebar({ isOpen, onClose }) {
     const { token, user, logout } = useAuth();
     const location = useLocation();
     const isAdmin = user?.email?.toLowerCase() === "jessiemarkbaronda06@gmail.com";
+    const isAdminOverview = location.pathname === "/admin"
+        && (!location.search || location.search === "?tab=overview");
     const [logoutOpen, setLogoutOpen] = useState(false);
 
     const handleNavigation = () => {
@@ -256,7 +258,7 @@ function Sidebar({ isOpen, onClose }) {
                             px-4 py-3
                             rounded-lg
                             transition
-                            ${location.search === "?tab=overview" ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"}
+                            ${isAdminOverview ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"}
                             ${!isOpen ? "justify-center" : ""}
                         `}
                         title={!isOpen ? "Admin overview" : ""}
