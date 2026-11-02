@@ -11,6 +11,13 @@ use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
+    public function publicStats()
+    {
+        return response()->json([
+            'users' => User::count(),
+        ]);
+    }
+
     public function register(Request $request)
     {
         $data = $request->validate([

@@ -3,15 +3,32 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\Application;
+use App\Models\Company;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 
 class AdminUserController extends Controller
 {
     public function index()
     {
+        $statusCounts = Application::query()
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->orderByDesc('total')
+            ->pluck('total', 'status');
+
         return response()->json([
             'users' => User::query()->orderBy('id')->get(['id', 'name', 'email', 'created_at']),
+            'overview' => [
+                'total_users' => User::count(),
+                'verified_users' => User::whereNotNull('email_verified_at')->count(),
+                'new_users' => User::where('created_at', '>=', Carbon::now()->subDays(30))->count(),
+                'total_companies' => Company::count(),
+                'total_applications' => Application::count(),
+                'applications_by_status' => $statusCounts,
+            ],
         ]);
     }
 

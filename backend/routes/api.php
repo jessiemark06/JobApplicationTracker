@@ -15,6 +15,7 @@ use App\Http\Controllers\PrivacyController;
 Route::post('/register', [AuthController::class, 'register'])
         ->middleware('throttle:registration');
 Route::get('/agreements', [PrivacyController::class, 'agreements']);
+Route::get('/stats', [AuthController::class, 'publicStats']);
 
 Route::post('/login', [AuthController::class, 'login'])
         ->middleware('throttle:auth');

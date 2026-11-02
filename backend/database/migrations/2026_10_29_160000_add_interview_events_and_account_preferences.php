@@ -54,7 +54,10 @@ public function up(): void
             $table->json('previous_values')->nullable();
             $table->json('new_values')->nullable();
             $table->timestamps();
-            $table->index(['recruitment_event_id', 'created_at']);
+            $table->index(
+                ['recruitment_event_id', 'created_at'],
+                'event_history_event_created_idx'
+            );
         });
     }
 

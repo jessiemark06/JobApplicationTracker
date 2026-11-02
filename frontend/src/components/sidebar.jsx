@@ -1,5 +1,8 @@
 import { NavLink } from "react-router-dom";
+import { useState } from "react";
+import { createPortal } from "react-dom";
 import {
+    Activity,
     LayoutDashboard,
     Building2,
     BriefcaseBusiness,
@@ -10,13 +13,24 @@ import {
     CalendarDays,
     UserRound,
     Bell,
+    Settings,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useLocation } from "react-router-dom";
 import { API_BASE_URL } from "../config/api";
 
-function Sidebar({ isOpen }) {
+function Sidebar({ isOpen, onClose }) {
 
     const { token, user, logout } = useAuth();
+    const location = useLocation();
+    const isAdmin = user?.email?.toLowerCase() === "jessiemarkbaronda06@gmail.com";
+    const [logoutOpen, setLogoutOpen] = useState(false);
+
+    const handleNavigation = () => {
+        if (window.innerWidth < 768) {
+            onClose();
+        }
+    };
 
     const handleLogout = async () => {
         try {
@@ -31,32 +45,40 @@ function Sidebar({ isOpen }) {
                 }
             );
 
-            if (response.ok) {
-                logout();
-                window.location.href = "/";
+            if (!response.ok && response.status !== 401) {
+                throw new Error("Could not notify the server about logout.");
             }
 
+            logout();
+            window.location.href = "/";
         } catch (error) {
             console.error("Logout failed:", error);
+            logout();
+            window.location.href = "/";
         }
     };
 
     return (
         <aside
             className={`
-                sticky
-                top-0
+                fixed
+                inset-y-0
+                left-0
                 shrink-0
                 h-screen
                 overflow-y-auto
                 bg-slate-900
                 text-white
-                transition-[width]
+                transition-[width,transform]
                 duration-300
                 z-40
                 flex
                 flex-col
-                ${isOpen ? "w-72 p-6" : "w-20 p-3"}
+                transition-[width,transform]
+                md:sticky
+                md:top-0
+                md:translate-x-0
+                ${isOpen ? "w-72 p-6 translate-x-0" : "w-20 p-3 -translate-x-full md:translate-x-0"}
             `}
         >
 
@@ -95,8 +117,10 @@ function Sidebar({ isOpen }) {
             </div>
 
             {/* Navigation */}
-            <nav className="space-y-2">
+            <nav className="space-y-2" onClick={handleNavigation}>
 
+                {!isAdmin && (
+                <>
                 {/* Dashboard */}
                 <NavLink
                     to="/dashboard"
@@ -220,23 +244,43 @@ function Sidebar({ isOpen }) {
                     <UserRound size={20} />
                     {isOpen && <span className="ml-3">Profile</span>}
                 </NavLink>
+                </>
+                )}
 
-                {user?.email?.toLowerCase() === "jessiemarkbaronda06@gmail.com" && (
+                {isAdmin && (
+                    <>
                     <NavLink
-                        to="/admin"
-                        className={({ isActive }) => `
+                            to="/admin?tab=overview"
+                            className={() => `
                             flex items-center
                             px-4 py-3
                             rounded-lg
                             transition
-                            ${isActive ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"}
+                            ${location.search === "?tab=overview" ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"}
                             ${!isOpen ? "justify-center" : ""}
                         `}
-                        title={!isOpen ? "Admin users" : ""}
+                        title={!isOpen ? "Admin overview" : ""}
+                    >
+                        <Activity size={20} />
+                        {isOpen && <span className="ml-3">Admin overview</span>}
+                    </NavLink>
+                    <NavLink
+                        to="/admin?tab=users"
+                        className={() => `flex items-center px-4 py-3 rounded-lg transition ${location.search === "?tab=users" ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"} ${!isOpen ? "justify-center" : ""}`}
+                        title={!isOpen ? "User management" : ""}
                     >
                         <Users size={20} />
-                        {isOpen && <span className="ml-3">Users</span>}
+                        {isOpen && <span className="ml-3">User management</span>}
                     </NavLink>
+                    <NavLink
+                        to="/admin?tab=settings"
+                        className={() => `flex items-center px-4 py-3 rounded-lg transition ${location.search === "?tab=settings" ? "bg-slate-800 text-white" : "text-slate-300 hover:bg-slate-800 hover:text-white"} ${!isOpen ? "justify-center" : ""}`}
+                        title={!isOpen ? "System settings" : ""}
+                    >
+                        <Settings size={20} />
+                        {isOpen && <span className="ml-3">System settings</span>}
+                    </NavLink>
+                    </>
                 )}
 
             </nav>
@@ -245,7 +289,7 @@ function Sidebar({ isOpen }) {
             <div className="mt-auto pt-6">
 
                 <button
-                    onClick={handleLogout}
+                    onClick={() => setLogoutOpen(true)}
                     className={`
                         w-full
                         flex
@@ -272,6 +316,20 @@ function Sidebar({ isOpen }) {
                 </button>
 
             </div>
+
+            {logoutOpen && createPortal(
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4" role="dialog" aria-modal="true" aria-labelledby="logout-title">
+                    <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-slate-900 shadow-2xl">
+                        <h2 id="logout-title" className="text-lg font-semibold">Log out of JobTrack?</h2>
+                        <p className="mt-2 text-sm text-gray-600">You will need to sign in again to access your account.</p>
+                        <div className="mt-6 flex justify-end gap-3">
+                            <button type="button" onClick={() => setLogoutOpen(false)} className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">Cancel</button>
+                            <button type="button" onClick={handleLogout} className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">Log out</button>
+                        </div>
+                    </div>
+                </div>,
+                document.body
+            )}
 
         </aside>
     );

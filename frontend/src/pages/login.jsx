@@ -1,18 +1,23 @@
  
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { API_BASE_URL } from "../config/api";
 import { ArrowLeft, ArrowRight, BriefcaseBusiness } from "lucide-react";
 
 function Login() {
     const navigate = useNavigate();
+    const location = useLocation();
 
     const { login } = useAuth();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [message, setMessage] = useState("");
+    const [message, setMessage] = useState(() => (
+        new URLSearchParams(location.search).get("session") === "expired"
+            ? "Your session expired. Please log in again."
+            : ""
+    ));
     const [loading, setLoading] = useState(false);
     const [verificationRequired, setVerificationRequired] = useState(false);
     const [resending, setResending] = useState(false);

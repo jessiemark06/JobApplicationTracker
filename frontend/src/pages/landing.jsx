@@ -14,6 +14,7 @@ import {
     Menu,
     X,
 } from "lucide-react";
+import { API_BASE_URL } from "../config/api";
 
 const applications = [
     { role: "Marketing Coordinator", company: "Northstar Studio", status: "Interview", tone: "bg-blue-50 text-blue-700" },
@@ -75,12 +76,23 @@ const steps = [
 function Landing() {
     const [menuOpen, setMenuOpen] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
+    const [userCount, setUserCount] = useState(null);
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 12);
         handleScroll();
         window.addEventListener("scroll", handleScroll, { passive: true });
         return () => window.removeEventListener("scroll", handleScroll);
+    }, []);
+
+    useEffect(() => {
+        fetch(`${API_BASE_URL}/stats`)
+            .then(async (response) => {
+                if (!response.ok) throw new Error("Could not load community statistics.");
+                return response.json();
+            })
+            .then((data) => setUserCount(Number.isFinite(data.users) ? data.users : null))
+            .catch(() => setUserCount(null));
     }, []);
 
     const scrollToSection = (event, sectionId) => {
@@ -182,9 +194,9 @@ function Landing() {
                             </p>
                         </div>
 
-                        <div aria-label="Illustrative JobTrack application dashboard preview" className="mx-auto w-full max-w-2xl motion-safe:animate-fade-in-up [animation-delay:150ms]">
-                            <div className="motion-safe:animate-float overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl shadow-slate-900/10">
-                                <div className="flex items-center justify-between gap-3 border-b border-gray-200 bg-slate-900 px-4 py-4 text-white sm:px-6">
+                        <div aria-label="Illustrative JobTrack application dashboard preview" className="relative mx-auto w-full max-w-2xl motion-safe:animate-fade-in-up [animation-delay:150ms]">
+                            <div className="relative motion-safe:animate-float overflow-visible rounded-xl border border-gray-200 bg-white shadow-2xl shadow-slate-900/10">
+                                <div className="flex items-center justify-between gap-3 rounded-t-xl border-b border-gray-200 bg-slate-900 px-4 py-4 text-white sm:px-6">
                                     <div className="flex items-center gap-3">
                                         <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-white/10">
                                             <BriefcaseBusiness size={18} aria-hidden="true" />
@@ -232,8 +244,17 @@ function Landing() {
                                         <span>Interviews and follow-ups stay connected to your applications.</span>
                                     </div>
                                 </div>
+                                <div className="absolute -bottom-5 right-0 z-10 inline-flex items-center gap-3 rounded-xl border-4 border-white bg-slate-900 px-4 py-3 text-white shadow-xl shadow-slate-900/30 sm:-right-8">
+                                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-sm font-bold text-slate-900">
+                                        {userCount === null ? "—" : userCount.toLocaleString()}
+                                    </span>
+                                    <span>
+                                        <span className="block text-sm font-semibold text-white">Registered users</span>
+                                        <span className="block text-xs text-slate-300">Organizing their next career move</span>
+                                    </span>
+                                </div>
                             </div>
-                            <p className="mt-3 text-center text-xs text-gray-500">A preview of the tools available in your JobTrack workspace.</p>
+                            <p className="mt-8 text-center text-xs text-gray-500">A preview of the tools available in your JobTrack workspace.</p>
                         </div>
                     </div>
                 </section>
@@ -316,7 +337,10 @@ function Landing() {
                         <Link to="/login" className="text-gray-600 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900">Log in</Link>
                         <Link to="/register" className="text-gray-600 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900">Create account</Link>
                     </nav>
-                    <p className="text-xs text-gray-500">© {new Date().getFullYear()} JobTrack</p>
+                    <div className="text-xs text-gray-500">
+                        <p>© {new Date().getFullYear()} JobTrack</p>
+                        <p className="mt-1">Developed by Jessie Mark Baronda</p>
+                    </div>
                 </div>
             </footer>
         </div>

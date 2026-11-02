@@ -47,6 +47,7 @@ export function AuthProvider({ children }) {
                 localStorage.removeItem("user");
                 setToken(null);
                 setUser(null);
+                window.location.replace(`${window.location.pathname}#/login?session=expired`);
             })
             .finally(() => setIsLoading(false));
     }, []);
